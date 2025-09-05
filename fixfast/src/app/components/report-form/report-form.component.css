@@ -1,0 +1,96 @@
+.form-group {
+  margin-bottom: 16;
+}
+
+.form-label {
+  color: #333333;
+  font-size: 14;
+  font-weight: bold;
+  margin-bottom: 4;
+}
+
+.form-input, .form-textarea {
+  background-color: white;
+  border-radius: 8;
+  border-width: 1;
+  border-color: #E0E0E0;
+  padding: 12;
+  font-size: 16;
+}
+
+.form-input:focus, .form-textarea:focus {
+  border-color: #2196F3;
+}
+
+.severity-grid {
+  margin-top: 8;
+}
+
+.btn-severity {
+  font-size: 12;
+  padding: 8;
+  margin: 2;
+  border-radius: 6;
+  background-color: #F5F5F5;
+  color: #666666;
+  border-width: 1;
+  border-color: #E0E0E0;
+}
+
+.btn-severity.active {
+  background-color: #2196F3;
+  color: white;
+  border-color: #2196F3;
+}
+
+.section-header {
+  font-size: 16;
+  font-weight: bold;
+  color: #2196F3;
+  margin-top: 16;
+}
+
+.attachment-item {
+  background-color: #F8F8F8;
+  border-radius: 4;
+  padding: 8;
+}
+
+.btn-remove {
+  background-color: #F44336;
+  color: white;
+  border-radius: 12;
+  width: 24;
+  height: 24;
+  font-size: 12;
+}
+
+.btn-primary {
+  background-color: #2196F3;
+  color: white;
+  font-size: 16;
+  border-radius: 8;
+  padding: 16;
+  font-weight: bold;
+}
+
+.btn-secondary {
+  background-color: #FF9800;
+  color: white;
+  border-radius: 6;
+  padding: 8;
+}
+
+.btn-small {
+  font-size: 12;
+  padding: 8;
+}
+
+.btn-large {
+  font-size: 18;
+  padding: 16;
+}
+
+.text-primary {
+  color: #2196F3;
+}

@@ -1,0 +1,164 @@
+<ActionBar title="Profile" backgroundColor="#2196F3" color="white">
+  <ActionItem
+    text="Edit"
+    (tap)="editProfile()"
+    ios.position="right"
+    android.position="actionBar"
+  ></ActionItem>
+</ActionBar>
+
+<ScrollView>
+  <StackLayout class="p-4">
+    <!-- Profile Header -->
+    <StackLayout
+      class="profile-header mb-4 p-4"
+      backgroundColor="white"
+      borderRadius="8"
+    >
+      <GridLayout columns="auto, *" class="mb-3">
+        <Label col="0" text="👤" class="profile-avatar mr-3"></Label>
+        <StackLayout col="1">
+          <Label [text]="profile.name" class="text-xl font-bold"></Label>
+          <Label [text]="profile.email" class="text-sm text-gray-600"></Label>
+          <Label
+            [text]="profile.role + ' • ' + profile.department"
+            class="text-sm text-primary"
+          ></Label>
+        </StackLayout>
+      </GridLayout>
+
+      <Label
+        [text]="'Member since ' + (profile.joinDate | date : 'MMMM yyyy')"
+        class="text-xs text-gray-500"
+      ></Label>
+    </StackLayout>
+
+    <!-- Statistics Cards -->
+    <Label
+      text="Your Statistics"
+      class="text-lg font-bold text-primary mb-3"
+    ></Label>
+
+    <GridLayout columns="*, *" class="stats-grid mb-4">
+      <StackLayout
+        col="0"
+        class="stat-card mr-2 p-3"
+        backgroundColor="white"
+        borderRadius="8"
+      >
+        <Label text="📊" class="text-2xl text-center mb-1"></Label>
+        <Label
+          [text]="profile.totalTicketsReported.toString()"
+          class="text-xl font-bold text-center"
+        ></Label>
+        <Label
+          text="Total Reports"
+          class="text-xs text-center text-gray-600"
+        ></Label>
+      </StackLayout>
+
+      <StackLayout
+        col="1"
+        class="stat-card ml-2 p-3"
+        backgroundColor="white"
+        borderRadius="8"
+      >
+        <Label text="✅" class="text-2xl text-center mb-1"></Label>
+        <Label
+          [text]="profile.totalTicketsResolved.toString()"
+          class="text-xl font-bold text-center"
+        ></Label>
+        <Label
+          text="Resolved"
+          class="text-xs text-center text-gray-600"
+        ></Label>
+      </StackLayout>
+    </GridLayout>
+
+    <GridLayout columns="*, *" class="stats-grid mb-4">
+      <StackLayout
+        col="0"
+        class="stat-card mr-2 p-3"
+        backgroundColor="white"
+        borderRadius="8"
+      >
+        <Label text="📅" class="text-2xl text-center mb-1"></Label>
+        <Label
+          [text]="stats.ticketsThisMonth.toString()"
+          class="text-xl font-bold text-center"
+        ></Label>
+        <Label
+          text="This Month"
+          class="text-xs text-center text-gray-600"
+        ></Label>
+      </StackLayout>
+
+      <StackLayout
+        col="1"
+        class="stat-card ml-2 p-3"
+        backgroundColor="white"
+        borderRadius="8"
+      >
+        <Label text="⏱" class="text-2xl text-center mb-1"></Label>
+        <Label
+          [text]="stats.averageResolutionTime + ' days'"
+          class="text-xl font-bold text-center"
+        ></Label>
+        <Label
+          text="Avg Resolution"
+          class="text-xs text-center text-gray-600"
+        ></Label>
+      </StackLayout>
+    </GridLayout>
+
+    <!-- Recent Activity -->
+    <Label
+      text="Recent Tickets"
+      class="text-lg font-bold text-primary mb-3"
+    ></Label>
+
+    <StackLayout *ngIf="recentTickets.length === 0" class="empty-state p-4">
+      <Label text="📋" class="text-4xl text-center mb-2"></Label>
+      <Label text="No recent tickets" class="text-center text-gray-500"></Label>
+    </StackLayout>
+
+    <StackLayout
+      *ngFor="let ticket of recentTickets"
+      class="ticket-item mb-2 p-3"
+      backgroundColor="white"
+      borderRadius="6"
+    >
+      <GridLayout columns="*, auto">
+        <StackLayout col="0">
+          <Label [text]="ticket.title" class="text-sm font-bold mb-1"></Label>
+          <Label [text]="ticket.location" class="text-xs text-gray-600"></Label>
+        </StackLayout>
+        <StackLayout col="1" class="text-right">
+          <Label
+            [text]="ticket.status.replace('-', ' ').toUpperCase()"
+            [backgroundColor]="getTicketStatusColor(ticket.status)"
+            class="status-badge text-white text-center mb-1"
+          ></Label>
+          <Label
+            [text]="ticket.createdAt | date : 'MM/dd'"
+            class="text-xs text-gray-400"
+          ></Label>
+        </StackLayout>
+      </GridLayout>
+    </StackLayout>
+
+    <!-- Actions -->
+    <StackLayout class="actions-section mt-4">
+      <Button text="Settings ⚙️" class="btn-secondary btn-large mb-2"></Button>
+      <Button
+        text="Help & Support 💬"
+        class="btn-secondary btn-large mb-2"
+      ></Button>
+      <Button
+        text="Logout 🚪"
+        (tap)="logout()"
+        class="btn-outline btn-large"
+      ></Button>
+    </StackLayout>
+  </StackLayout>
+</ScrollView>

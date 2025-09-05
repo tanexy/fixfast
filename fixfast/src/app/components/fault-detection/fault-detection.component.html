@@ -1,0 +1,235 @@
+<ActionBar title="Fault Detection" backgroundColor="#6366f1" color="white">
+  <ActionItem text="Refresh" (tap)="loadFaults()" ios.position="right" android.position="actionBar"></ActionItem>
+</ActionBar>
+
+<ScrollView>
+  <StackLayout class="p-4 bg-gradient">
+    
+    <!-- Status Cards Grid -->
+    <GridLayout columns="*, *" class="mb-4">
+      <!-- System Status Card -->
+      <StackLayout col="0" class="status-card p-4 mr-2" backgroundColor="white" borderRadius="16" elevation="2">
+        <Label text="System Status" class="card-title mb-2"></Label>
+        <StackLayout orientation="horizontal" class="mb-2">
+          <Label [text]="isMonitoring ? '●' : '●'" 
+                 [color]="isMonitoring ? '#10b981' : '#ef4444'" 
+                 class="status-dot mr-1"></Label>
+          <Label [text]="isMonitoring ? 'Active' : 'Stopped'"
+                 [color]="isMonitoring ? '#10b981' : '#ef4444'"
+                 class="status-text"></Label>
+        </StackLayout>
+        <Label [text]="'Last: ' + (lastScanTime | date:'HH:mm')"
+               class="timestamp-text"></Label>
+      </StackLayout>
+      
+      <!-- Quick Stats Card -->
+      <StackLayout col="1" class="status-card p-4 ml-2" backgroundColor="white" borderRadius="16" elevation="2">
+        <Label text="Issues Found" class="card-title mb-2"></Label>
+        <Label [text]="faults.length" class="stats-number mb-1"></Label>
+        <Label [text]="getHighPriorityCount() + ' high priority'" class="stats-detail"></Label>
+      </StackLayout>
+    </GridLayout>
+
+    <!-- Control Buttons -->
+    <GridLayout columns="*, *" class="mb-6">
+      <Button col="0" text="🔍 Manual Scan" (tap)="runManualScan()"
+              class="modern-btn primary-btn mr-2" 
+              backgroundColor="#6366f1" color="white" borderRadius="12"></Button>
+      <Button col="1" [text]="isMonitoring ? '⏹ Stop Monitor' : '▶ Start Monitor'"
+              (tap)="toggleMonitoring()"
+              [backgroundColor]="isMonitoring ? '#f1f5f9' : '#10b981'"
+              [color]="isMonitoring ? '#475569' : 'white'"
+              class="modern-btn ml-2" borderRadius="12"></Button>
+    </GridLayout>
+
+    <!-- Section Header -->
+    <StackLayout class="section-header mb-4">
+      <Label text="🚨 Detected Issues" class="section-title"></Label>
+      <Label [text]="faults.length + ' issues require attention'" class="section-subtitle"></Label>
+    </StackLayout>
+
+    <!-- Empty State -->
+    <StackLayout *ngIf="faults.length === 0" class="empty-state p-6" backgroundColor="white" borderRadius="16" elevation="1">
+      <Label text="✅" class="empty-icon mb-3"></Label>
+      <Label text="All Systems Operational" class="empty-title mb-2"></Label>
+      <Label text="No faults detected in your infrastructure" class="empty-subtitle mb-1"></Label>
+      <Label text="Your systems are running smoothly" class="empty-detail"></Label>
+    </StackLayout>
+
+    <!-- Faults List -->
+    <StackLayout *ngFor="let fault of faults; let i = index" 
+                 class="fault-card mb-4 p-4" 
+                 backgroundColor="white" 
+                 borderRadius="16" 
+                 elevation="2">
+      
+      <!-- Fault Header -->
+      <GridLayout columns="auto, *, auto" class="mb-3">
+        <Label col="0" [text]="getFaultIcon(fault.type)" class="fault-type-icon mr-3"></Label>
+        <StackLayout col="1">
+          <Label [text]="fault.title" class="fault-title mb-1"></Label>
+          <Label [text]="fault.location" class="fault-location"></Label>
+        </StackLayout>
+        <Label col="2" [text]="fault.severity.toUpperCase()"
+               [backgroundColor]="getSeverityColor(fault.severity)"
+               class="severity-badge" color="white" borderRadius="20"></Label>
+      </GridLayout>
+
+      <!-- Fault Description -->
+      <Label [text]="fault.description" class="fault-description mb-3" textWrap="true"></Label>
+      
+      <!-- Fault Footer -->
+      <GridLayout columns="*, auto" class="fault-footer">
+        <Label col="0" [text]="'🕐 ' + getTimeAgo(fault.timestamp)" class="fault-time"></Label>
+        <Label col="1" [text]="getPriorityEmoji(fault.severity)" class="priority-indicator"></Label>
+      </GridLayout>
+    </StackLayout>
+
+  </StackLayout>
+</ScrollView>
+
+<style>
+  /* Background Gradient */
+  .bg-gradient {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  }
+
+  /* Card Styles */
+  .status-card {
+    border: 1px solid #e2e8f0;
+  }
+
+  .fault-card {
+    border: 1px solid #e5e7eb;
+    margin-bottom: 12;
+  }
+
+  /* Typography */
+  .card-title {
+    font-size: 14;
+    font-weight: bold;
+    color: #374151;
+  }
+
+  .status-text {
+    font-size: 13;
+    font-weight: 600;
+  }
+
+  .timestamp-text {
+    font-size: 11;
+    color: #6b7280;
+  }
+
+  .stats-number {
+    font-size: 24;
+    font-weight: bold;
+    color: #1f2937;
+  }
+
+  .stats-detail {
+    font-size: 11;
+    color: #ef4444;
+  }
+
+  .section-title {
+    font-size: 20;
+    font-weight: bold;
+    color: #1f2937;
+  }
+
+  .section-subtitle {
+    font-size: 13;
+    color: #6b7280;
+  }
+
+  /* Empty State */
+  .empty-icon {
+    font-size: 48;
+    text-align: center;
+  }
+
+  .empty-title {
+    font-size: 18;
+    font-weight: bold;
+    color: #059669;
+    text-align: center;
+  }
+
+  .empty-subtitle {
+    font-size: 14;
+    color: #6b7280;
+    text-align: center;
+  }
+
+  .empty-detail {
+    font-size: 12;
+    color: #9ca3af;
+    text-align: center;
+  }
+
+  /* Fault Cards */
+  .fault-type-icon {
+    font-size: 24;
+    width: 40;
+    text-align: center;
+  }
+
+  .fault-title {
+    font-size: 16;
+    font-weight: bold;
+    color: #1f2937;
+  }
+
+  .fault-location {
+    font-size: 12;
+    color: #6b7280;
+  }
+
+  .fault-description {
+    font-size: 14;
+    color: #4b5563;
+    line-height: 1.4;
+  }
+
+  .fault-time {
+    font-size: 12;
+    color: #9ca3af;
+  }
+
+  .priority-indicator {
+    font-size: 16;
+  }
+
+  /* Severity Badge */
+  .severity-badge {
+    font-size: 10;
+    font-weight: bold;
+    padding: 4 8;
+    text-align: center;
+    min-width: 60;
+  }
+
+  /* Buttons */
+  .modern-btn {
+    font-size: 14;
+    font-weight: 600;
+    padding: 12 16;
+    elevation: 1;
+  }
+
+  .primary-btn {
+    elevation: 2;
+  }
+
+  /* Status dot animation */
+  .status-dot {
+    font-size: 16;
+  }
+
+  /* Section Header */
+  .section-header {
+    border-left: 4px solid #6366f1;
+    padding-left: 16;
+  }
+</style>

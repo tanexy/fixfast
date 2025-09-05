@@ -1,0 +1,64 @@
+<ActionBar title="Tickets" backgroundColor="#2196F3" color="white">
+  <ActionItem text="Refresh" (tap)="loadTickets()" ios.position="right" android.position="actionBar"></ActionItem>
+</ActionBar>
+
+<GridLayout rows="auto, *">
+  
+  <!-- Status Filter Header -->
+  <ScrollView row="0" orientation="horizontal" class="status-filter">
+    <StackLayout orientation="horizontal" class="p-2">
+      <Button *ngFor="let option of statusOptions"
+              [text]="option.display + ' (' + option.count + ')'"
+              (tap)="onStatusFilterChange(option.key)"
+              [class]="selectedStatus === option.key ? 'filter-btn active' : 'filter-btn'"
+              class="mr-2"></Button>
+    </StackLayout>
+  </ScrollView>
+
+  <!-- Tickets List -->
+  <ScrollView row="1">
+    <StackLayout class="p-4">
+      
+      <StackLayout *ngIf="filteredTickets.length === 0" class="empty-state">
+        <Label text="📋" class="text-4xl text-center mb-2"></Label>
+        <Label text="No tickets found" class="text-center text-gray-500 text-lg"></Label>
+        <Label text="All issues have been resolved" class="text-center text-sm text-gray-400"></Label>
+      </StackLayout>
+
+      <StackLayout *ngFor="let ticket of filteredTickets" 
+                   class="ticket-card mb-3 p-4" 
+                   backgroundColor="white">
+        
+        <!-- Ticket Header -->
+        <GridLayout columns="*, auto, auto" class="mb-2">
+          <Label col="0" [text]="ticket.title" class="text-lg font-bold"></Label>
+          <Label col="1" [text]="ticket.priority.toUpperCase()" 
+                 [backgroundColor]="getPriorityColor(ticket.priority)"
+                 class="priority-badge text-white text-center mr-2"></Label>
+          <Label col="2" [text]="ticket.status.replace('-', ' ').toUpperCase()" 
+                 [backgroundColor]="getStatusColor(ticket.status)"
+                 class="status-badge text-white text-center"></Label>
+        </GridLayout>
+
+        <!-- Ticket Details -->
+        <Label [text]="ticket.description" 
+               class="text-sm text-gray-600 mb-2" 
+               textWrap="true"></Label>
+        
+        <GridLayout columns="*, *" class="ticket-meta">
+          <StackLayout col="0">
+            <Label [text]="'📍 ' + ticket.location" class="text-xs text-gray-500"></Label>
+            <Label [text]="'👤 ' + ticket.reportedBy" class="text-xs text-gray-500"></Label>
+          </StackLayout>
+          <StackLayout col="1" class="text-right">
+            <Label [text]="ticket.createdAt | date:'short'" class="text-xs text-gray-400"></Label>
+            <Label [text]="ticket.assignedTo ? '🔧 ' + ticket.assignedTo : 'Unassigned'" 
+                   class="text-xs text-gray-500"></Label>
+          </StackLayout>
+        </GridLayout>
+      </StackLayout>
+
+    </StackLayout>
+  </ScrollView>
+
+</GridLayout>

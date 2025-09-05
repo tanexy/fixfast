@@ -1,0 +1,61 @@
+.network-status-card {
+  elevation: 2;
+  margin: 8;
+}
+
+.speed-metrics {
+  border-top-width: 1;
+  border-top-color: #F0F0F0;
+  padding-top: 12;
+  margin-top: 12;
+}
+
+.metric-item {
+  text-align: center;
+  padding: 4;
+}
+
+.testing-indicator {
+  text-align: center;
+  padding: 20;
+}
+
+.history-item {
+  elevation: 1;
+  margin: 2;
+}
+
+.empty-state {
+  text-align: center;
+  margin-top: 40;
+}
+
+.btn-primary {
+  background-color: #2196F3;
+  color: white;
+  font-size: 16;
+  border-radius: 8;
+  padding: 16;
+  font-weight: bold;
+}
+
+.btn-large {
+  font-size: 18;
+  padding: 16;
+}
+
+.text-primary {
+  color: #2196F3;
+}
+
+.text-gray-600 {
+  color: #666666;
+}
+
+.text-gray-500 {
+  color: #999999;
+}
+
+.text-gray-400 {
+  color: #AAAAAA;
+}

@@ -1,0 +1,64 @@
+.status-filter {
+  background-color: #F5F5F5;
+  border-bottom-width: 1;
+  border-bottom-color: #E0E0E0;
+}
+
+.filter-btn {
+  background-color: white;
+  color: #666666;
+  border-radius: 16;
+  padding: 8 16;
+  font-size: 12;
+  border-width: 1;
+  border-color: #E0E0E0;
+}
+
+.filter-btn.active {
+  background-color: #2196F3;
+  color: white;
+  border-color: #2196F3;
+}
+
+.ticket-card {
+  border-radius: 8;
+  elevation: 2;
+  border-left-width: 4;
+  border-left-color: #2196F3;
+}
+
+.priority-badge, .status-badge {
+  border-radius: 10;
+  font-size: 9;
+  padding: 4 8;
+  min-width: 50;
+}
+
+.ticket-meta {
+  margin-top: 8;
+  padding-top: 8;
+  border-top-width: 1;
+  border-top-color: #F0F0F0;
+}
+
+.empty-state {
+  text-align: center;
+  margin-top: 60;
+  padding: 20;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.text-gray-600 {
+  color: #666666;
+}
+
+.text-gray-500 {
+  color: #999999;
+}
+
+.text-gray-400 {
+  color: #AAAAAA;
+}

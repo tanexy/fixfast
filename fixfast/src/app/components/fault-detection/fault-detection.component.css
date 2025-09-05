@@ -1,0 +1,56 @@
+.status-card {
+  elevation: 2;
+  margin: 8;
+}
+
+.fault-item {
+  elevation: 1;
+  margin: 4;
+  border-left-width: 4;
+  border-left-color: #2196F3;
+}
+
+.severity-badge .badge {
+  border-radius: 12;
+  font-size: 10;
+  min-width: 60;
+}
+
+.empty-state {
+  text-align: center;
+  margin-top: 40;
+}
+
+.btn {
+  font-size: 16;
+  border-radius: 8;
+  padding: 12;
+}
+
+.btn-primary {
+  background-color: #2196F3;
+  color: white;
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: #2196F3;
+  border-color: #2196F3;
+  border-width: 1;
+}
+
+.text-primary {
+  color: #2196F3;
+}
+
+.text-gray-600 {
+  color: #666666;
+}
+
+.text-gray-500 {
+  color: #999999;
+}
+
+.text-gray-400 {
+  color: #AAAAAA;
+}

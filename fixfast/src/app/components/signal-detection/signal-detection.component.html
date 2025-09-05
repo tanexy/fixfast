@@ -1,0 +1,93 @@
+<ActionBar title="Network Status" backgroundColor="#2196F3" color="white">
+  <ActionItem text="Refresh" (tap)="loadNetworkInfo()" ios.position="right" android.position="actionBar"></ActionItem>
+</ActionBar>
+
+<ScrollView>
+  <StackLayout class="p-4">
+
+    <!-- Current Network Status -->
+    <Label text="Current Network" class="text-xl font-bold text-primary mb-4"></Label>
+    
+    <GridLayout *ngIf="networkInfo" class="network-status-card mb-4 p-4" backgroundColor="white" borderRadius="8">
+      <StackLayout>
+        
+        <!-- Connection Status -->
+        <GridLayout columns="auto, *, auto" class="mb-3">
+          <Label col="0" [text]="getConnectionTypeIcon(networkInfo.connectionType)" class="text-2xl mr-3"></Label>
+          <StackLayout col="1">
+            <Label [text]="networkInfo.connectionType.toUpperCase()" class="text-lg font-bold"></Label>
+            <Label [text]="networkInfo.isConnected ? 'Connected' : 'Disconnected'" 
+                   [color]="networkInfo.isConnected ? '#4CAF50' : '#F44336'"></Label>
+          </StackLayout>
+          <Label col="2" [text]="networkInfo.timestamp | date:'HH:mm'" class="text-sm text-gray-500"></Label>
+        </GridLayout>
+
+        <!-- Signal Strength -->
+        <GridLayout columns="*, auto" class="mb-3">
+          <StackLayout col="0">
+            <Label text="Signal Strength" class="text-sm text-gray-600"></Label>
+            <Label [text]="getSignalStrengthText(networkInfo.signalStrength)" 
+                   [color]="getSignalStrengthColor(networkInfo.signalStrength)" 
+                   class="font-bold"></Label>
+          </StackLayout>
+          <Label col="1" [text]="networkInfo.signalStrength + '%'" 
+                 [color]="getSignalStrengthColor(networkInfo.signalStrength)" 
+                 class="text-2xl font-bold"></Label>
+        </GridLayout>
+
+        <!-- Speed Metrics -->
+        <GridLayout columns="*, *, *" class="speed-metrics">
+          <StackLayout col="0" class="metric-item">
+            <Label text="⬇ Download" class="text-xs text-gray-500"></Label>
+            <Label [text]="formatSpeed(networkInfo.downloadSpeed)" class="text-lg font-bold"></Label>
+          </StackLayout>
+          <StackLayout col="1" class="metric-item">
+            <Label text="⬆ Upload" class="text-xs text-gray-500"></Label>
+            <Label [text]="formatSpeed(networkInfo.uploadSpeed)" class="text-lg font-bold"></Label>
+          </StackLayout>
+          <StackLayout col="2" class="metric-item">
+            <Label text="⚡ Latency" class="text-xs text-gray-500"></Label>
+            <Label [text]="networkInfo.latency + 'ms'" class="text-lg font-bold"></Label>
+          </StackLayout>
+        </GridLayout>
+
+      </StackLayout>
+    </GridLayout>
+
+    <!-- Speed Test Button -->
+    <Button text="Run Speed Test" 
+            (tap)="runSpeedTest()" 
+            [isEnabled]="!isTestingSpeed"
+            class="btn-primary btn-large mb-4"></Button>
+    
+    <StackLayout *ngIf="isTestingSpeed" class="testing-indicator mb-4">
+      <ActivityIndicator busy="true" class="mb-2"></ActivityIndicator>
+      <Label text="Running speed test..." class="text-center text-gray-600"></Label>
+    </StackLayout>
+
+    <!-- Test History -->
+    <Label text="Recent Tests" class="text-lg font-bold text-primary mb-3"></Label>
+    
+    <StackLayout *ngIf="testHistory.length === 0" class="empty-state p-4">
+      <Label text="📊" class="text-4xl text-center mb-2"></Label>
+      <Label text="No test history" class="text-center text-gray-500"></Label>
+      <Label text="Run a speed test to see results" class="text-center text-sm text-gray-400"></Label>
+    </StackLayout>
+
+    <StackLayout *ngFor="let test of testHistory" class="history-item mb-2 p-3" backgroundColor="white" borderRadius="6">
+      <GridLayout columns="*, auto">
+        <StackLayout col="0">
+          <GridLayout columns="*, *, *">
+            <Label col="0" [text]="'⬇ ' + formatSpeed(test.downloadSpeed)" class="text-sm"></Label>
+            <Label col="1" [text]="'⬆ ' + formatSpeed(test.uploadSpeed)" class="text-sm"></Label>
+            <Label col="2" [text]="test.latency + 'ms'" class="text-sm"></Label>
+          </GridLayout>
+          <Label [text]="test.connectionType + ' • ' + getSignalStrengthText(test.signalStrength)" 
+                 class="text-xs text-gray-500 mt-1"></Label>
+        </StackLayout>
+        <Label col="1" [text]="test.timestamp | date:'MM/dd HH:mm'" class="text-xs text-gray-400"></Label>
+      </GridLayout>
+    </StackLayout>
+
+  </StackLayout>
+</ScrollView>
