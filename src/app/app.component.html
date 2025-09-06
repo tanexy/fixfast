@@ -1,3 +1,52 @@
-<GridLayout>
-  <page-router-outlet></page-router-outlet>
+<!-- app.component.html -->
+<GridLayout rows="*, auto" class="main-container">
+  <!-- Content Area -->
+  <StackLayout row="0" class="content-area">
+    <page-router-outlet name="dashboardOutlet" [visibility]="activeTab === 'dashboard' ? 'visible' : 'collapse'"></page-router-outlet>
+    <page-router-outlet name="reportOutlet" [visibility]="activeTab === 'report' ? 'visible' : 'collapse'"></page-router-outlet>
+    <page-router-outlet name="ticketsOutlet" [visibility]="activeTab === 'tickets' ? 'visible' : 'collapse'"></page-router-outlet>
+    <page-router-outlet name="networkOutlet" [visibility]="activeTab === 'network' ? 'visible' : 'collapse'"></page-router-outlet>
+    <page-router-outlet name="profileOutlet" [visibility]="activeTab === 'profile' ? 'visible' : 'collapse'"></page-router-outlet>
+    <page-router-outlet></page-router-outlet>
+  </StackLayout>
+
+  <!-- Bottom Navigation -->
+  <GridLayout row="1" columns="*, *, *, *, *" class="bottom-nav">
+    
+    <!-- Dashboard -->
+    <StackLayout col="0" [class]="getTabClasses('dashboard')" (tap)="onTabSelect('dashboard')">
+      <Label text="&#xf3fd;" [class]="getIconClasses('dashboard')"></Label>
+      <Label text="Dashboard" [class]="getLabelClasses('dashboard')"></Label>
+      <StackLayout [class]="getIndicatorClasses('dashboard')"></StackLayout>
+    </StackLayout>
+
+    <!-- Reports -->
+    <StackLayout col="1" [class]="getTabClasses('report')" (tap)="onTabSelect('report')">
+      <Label text="&#xf201;" [class]="getIconClasses('report')"></Label>
+      <Label text="Reports" [class]="getLabelClasses('report')"></Label>
+      <StackLayout [class]="getIndicatorClasses('report')"></StackLayout>
+    </StackLayout>
+
+    <!-- Tickets -->
+    <StackLayout col="2" [class]="getTabClasses('tickets')" (tap)="onTabSelect('tickets')">
+      <Label text="&#xf3ff;" [class]="getIconClasses('tickets')"></Label>
+      <Label text="Tickets" [class]="getLabelClasses('tickets')"></Label>
+      <StackLayout [class]="getIndicatorClasses('tickets')"></StackLayout>
+    </StackLayout>
+
+    <!-- Network -->
+    <StackLayout col="3" [class]="getTabClasses('network')" (tap)="onTabSelect('network')">
+      <Label text="&#xf0ac;" [class]="getIconClasses('network')"></Label>
+      <Label text="Network" [class]="getLabelClasses('network')"></Label>
+      <StackLayout [class]="getIndicatorClasses('network')"></StackLayout>
+    </StackLayout>
+
+    <!-- Profile -->
+    <StackLayout col="4" [class]="getTabClasses('profile')" (tap)="onTabSelect('profile')">
+      <Label text="&#xf007;" [class]="getIconClasses('profile')"></Label>
+      <Label text="Profile" [class]="getLabelClasses('profile')"></Label>
+      <StackLayout [class]="getIndicatorClasses('profile')"></StackLayout>
+    </StackLayout>
+
+  </GridLayout>
 </GridLayout>

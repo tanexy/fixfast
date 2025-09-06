@@ -1,11 +1,11 @@
 import { NativeScriptConfig } from '@nativescript/core';
 
 export default {
-  id: 'org.nativescript.fixfast',
+  id: 'org.nativescript.app',
   appPath: 'src',
-  appResourcesPath: 'App_Resources',
+  appResourcesPath: '../../tools/assets/App_Resources',
   android: {
     v8Flags: '--expose_gc',
-    markingMode: 'none'
-  }
+    markingMode: 'none',
+  },
 } as NativeScriptConfig;
