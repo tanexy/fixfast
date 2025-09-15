@@ -2,87 +2,70 @@
 
 <ScrollView>
   <StackLayout class="p-4">
-    
+
     <Label text="Report a New Issue" class="text-xl font-bold text-primary mb-4"></Label>
-    
+
     <!-- Title Field -->
     <StackLayout class="form-group mb-4">
       <Label text="Issue Title *" class="form-label"></Label>
-      <TextField [(ngModel)]="report.title" 
-                 hint="Brief description of the issue"
-                 class="form-input"></TextField>
+      <TextField [(ngModel)]="report.title" hint="Brief description of the issue" class="form-input"></TextField>
     </StackLayout>
 
     <!-- Description Field -->
     <StackLayout class="form-group mb-4">
       <Label text="Description *" class="form-label"></Label>
-      <TextView [(ngModel)]="report.description" 
-                hint="Detailed description of the problem"
-                class="form-textarea"
-                height="100"></TextView>
+      <TextView [(ngModel)]="report.description" hint="Detailed description of the problem" class="form-textarea"
+        height="100"></TextView>
     </StackLayout>
 
     <!-- Location Field -->
     <StackLayout class="form-group mb-4">
       <Label text="Location *" class="form-label"></Label>
-      <TextField [(ngModel)]="report.location" 
-                 hint="Building, floor, room number"
-                 class="form-input"></TextField>
+      <TextField [(ngModel)]="report.location" hint="Building, floor, room number" class="form-input"></TextField>
     </StackLayout>
 
     <!-- Severity Selection -->
     <StackLayout class="form-group mb-4">
       <Label text="Priority Level" class="form-label mb-2"></Label>
       <GridLayout columns="*, *, *, *" class="severity-grid">
-        <Button *ngFor="let option of severityOptions; let i = index"
-                [col]="i"
-                [text]="option.display"
-                [class]="report.severity === option.key ? 'btn-severity active' : 'btn-severity'"
-                (tap)="report.severity = option.key"></Button>
+        <Button *ngFor="let option of severityOptions; let i = index" [col]="i" [text]="option.display"
+          [class]="report.severity === option.key ? 'btn-severity active' : 'btn-severity'"
+          (tap)="report.severity = option.key"></Button>
       </GridLayout>
     </StackLayout>
 
     <!-- Reporter Information -->
     <Label text="Contact Information" class="section-header mb-3"></Label>
-    
+
     <StackLayout class="form-group mb-4">
       <Label text="Your Name" class="form-label"></Label>
-      <TextField [(ngModel)]="report.reporterName" 
-                 hint="Full name"
-                 class="form-input"></TextField>
+      <TextField [(ngModel)]="report.reporterName" hint="Full name" class="form-input"></TextField>
     </StackLayout>
 
     <StackLayout class="form-group mb-4">
       <Label text="Contact Info" class="form-label"></Label>
-      <TextField [(ngModel)]="report.reporterContact" 
-                 hint="Email or phone number"
-                 class="form-input"></TextField>
+      <TextField [(ngModel)]="report.reporterContact" hint="Email or phone number" class="form-input"></TextField>
     </StackLayout>
 
     <!-- Attachments Section -->
     <StackLayout class="form-group mb-4">
       <GridLayout columns="*, auto">
         <Label col="0" text="Attachments" class="form-label"></Label>
-        <Button col="1" text="+ Add Photo" (tap)="addAttachment()" 
-                class="btn-secondary btn-small"></Button>
+        <Button col="1" text="+ Add Photo" (tap)="addAttachment()" class="btn-secondary btn-small"></Button>
       </GridLayout>
-      
-      <StackLayout *ngFor="let attachment of report.attachments; let i = index" 
-                   class="attachment-item mt-2">
+
+      <StackLayout *ngFor="let attachment of report.attachments; let i = index" class="attachment-item mt-2">
         <GridLayout columns="*, auto">
           <Label [col]="0" [text]="'📎 ' + attachment" class="text-sm"></Label>
-          <Button [col]="1" text="✕" (tap)="removeAttachment(i)" 
-                  class="btn-remove"></Button>
+          <Button [col]="1" text="✕" (tap)="removeAttachment(i)" class="btn-remove"></Button>
         </GridLayout>
       </StackLayout>
     </StackLayout>
 
     <!-- Submit Button -->
-    <Button text="Submit Report" 
-            (tap)="onSubmit()" 
-            [isEnabled]="!isSubmitting"
-            class="btn-primary btn-large mt-4"></Button>
-    
+    <Button text="Submit Report" (tap)="onSubmit()" [isEnabled]="!isSubmitting"
+      class="btn-primary btn-large mt-4"></Button>
+
     <ActivityIndicator [busy]="isSubmitting" class="mt-2"></ActivityIndicator>
 
   </StackLayout>

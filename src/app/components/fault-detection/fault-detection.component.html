@@ -4,24 +4,21 @@
 
 <ScrollView>
   <StackLayout class="p-4 bg-gradient">
-    
+
     <!-- Status Cards Grid -->
     <GridLayout columns="*, *" class="mb-4">
       <!-- System Status Card -->
       <StackLayout col="0" class="status-card p-4 mr-2" backgroundColor="white" borderRadius="16" elevation="2">
         <Label text="System Status" class="card-title mb-2"></Label>
         <StackLayout orientation="horizontal" class="mb-2">
-          <Label [text]="isMonitoring ? '●' : '●'" 
-                 [color]="isMonitoring ? '#10b981' : '#ef4444'" 
-                 class="status-dot mr-1"></Label>
-          <Label [text]="isMonitoring ? 'Active' : 'Stopped'"
-                 [color]="isMonitoring ? '#10b981' : '#ef4444'"
-                 class="status-text"></Label>
+          <Label [text]="isMonitoring ? '●' : '●'" [color]="isMonitoring ? '#10b981' : '#ef4444'"
+            class="status-dot mr-1"></Label>
+          <Label [text]="isMonitoring ? 'Active' : 'Stopped'" [color]="isMonitoring ? '#10b981' : '#ef4444'"
+            class="status-text"></Label>
         </StackLayout>
-        <Label [text]="'Last: ' + (lastScanTime | date:'HH:mm')"
-               class="timestamp-text"></Label>
+        <Label [text]="'Last: ' + (lastScanTime | date:'HH:mm')" class="timestamp-text"></Label>
       </StackLayout>
-      
+
       <!-- Quick Stats Card -->
       <StackLayout col="1" class="status-card p-4 ml-2" backgroundColor="white" borderRadius="16" elevation="2">
         <Label text="Issues Found" class="card-title mb-2"></Label>
@@ -29,27 +26,71 @@
         <Label [text]="getHighPriorityCount() + ' high priority'" class="stats-detail"></Label>
       </StackLayout>
     </GridLayout>
+    <GridLayout columns="*, *" class="mb-4">
+      <!-- System Status Card -->
+      <StackLayout col="0" class="status-card p-4 mr-2" backgroundColor="white" borderRadius="16" elevation="2">
+        <Label text="Signal Strength" class="card-title mb-2"></Label>
+        <StackLayout orientation="horizontal" class="mb-2">
+          <Label [text]="isSignalOk ? '●' : '●'" [color]="isSignalOk ? '#10b981' : '#ef4444'"
+            class="status-dot mr-1"></Label>
+          <Label [text]="isSignalOk ? 'Excellent' : 'Poor'" [color]="isSignalOk ? '#10b981' : '#ef4444'"
+            class="status-text"></Label>
+        </StackLayout>
+        <Label [text]="'Last Checked: ' + (lastScanTime | date:'HH:mm')" class="timestamp-text"></Label>
+      </StackLayout>
 
-    <!-- Control Buttons -->
-    <GridLayout columns="*, *" class="mb-6">
-      <Button col="0" text="🔍 Manual Scan" (tap)="runManualScan()"
-              class="modern-btn primary-btn mr-2" 
-              backgroundColor="#6366f1" color="white" borderRadius="12"></Button>
-      <Button col="1" [text]="isMonitoring ? '⏹ Stop Monitor' : '▶ Start Monitor'"
-              (tap)="toggleMonitoring()"
-              [backgroundColor]="isMonitoring ? '#f1f5f9' : '#10b981'"
-              [color]="isMonitoring ? '#475569' : 'white'"
-              class="modern-btn ml-2" borderRadius="12"></Button>
+      <StackLayout col="1" class="status-card p-4 mr-2" backgroundColor="white" borderRadius="16" elevation="2">
+        <Label text="Fuel Levels" class="card-title mb-2"></Label>
+        <StackLayout orientation="horizontal" class="mb-2">
+          <Label [text]="fuelLevelNormal ? '●' : '●'" [color]="fuelLevelNormal ? '#10b981' : '#ef4444'"
+            class="status-dot mr-1"></Label>
+          <Label [text]="fuelLevelNormal ? 'Full' : 'Almost Empty'" [color]="fuelLevelNormal ? '#10b981' : '#ef4444'"
+            class="status-text"></Label>
+        </StackLayout>
+        <Label [text]="'Last Checked: ' + (lastScanTime | date:'HH:mm')" class="timestamp-text"></Label>
+      </StackLayout>
+    </GridLayout>
+    <GridLayout columns="*, *," class="mb-4">
+
+      <StackLayout col="0" class="status-card p-4 mr-2" backgroundColor="white" borderRadius="16" elevation="2">
+        <Label text="UPS" class="card-title mb-2"></Label>
+        <StackLayout orientation="horizontal" class="mb-2">
+          <Label [text]="'●'" [color]=" '#10b981' " class="status-dot mr-1"></Label>
+          <Label [text]="batteryLevel+'%'" class="status-text"></Label>
+        </StackLayout>
+        <Label [text]="'Last Checked: ' + (lastScanTime | date:'HH:mm')" class="timestamp-text"></Label>
+      </StackLayout>
+
+      <StackLayout col="1" class="status-card p-4 mr-2" backgroundColor="white" borderRadius="16" elevation="2">
+        <Label text="Temperature" class="card-title mb-2"></Label>
+        <StackLayout orientation="horizontal" class="mb-2">
+          <Label [text]="temperatureNormal ? '●' : '●'" [color]="temperatureNormal ? '#10b981' : '#ef4444'"
+            class="status-dot mr-1"></Label>
+          <Label [text]="temperatureNormal ? 'Normal' : 'Critical'" [color]="temperatureNormal ? '#10b981' : '#ef4444'"
+            class="status-text"></Label>
+        </StackLayout>
+        <Label [text]="'Last Checked: ' + (lastScanTime | date:'HH:mm')" class="timestamp-text"></Label>
+      </StackLayout>
     </GridLayout>
 
+    <!-- Control Buttons 
+    <GridLayout columns="*, *" class="mb-6">
+      <Button col="0" text="🔍 Manual Scan" (tap)="runManualScan()" class="modern-btn primary-btn mr-2"
+        backgroundColor="#6366f1" color="white" borderRadius="12"></Button>
+      <Button col="1" [text]="isMonitoring ? '⏹ Stop Monitor' : '▶ Start Monitor'" (tap)="toggleMonitoring()"
+        [backgroundColor]="isMonitoring ? '#f1f5f9' : '#10b981'" [color]="isMonitoring ? '#475569' : 'white'"
+        class="modern-btn ml-2" borderRadius="12"></Button>
+    </GridLayout>-->
+
     <!-- Section Header -->
-    <StackLayout class="section-header mb-4">
-      <Label text="🚨 Detected Issues" class="section-title"></Label>
-      <Label [text]="faults.length + ' issues require attention'" class="section-subtitle"></Label>
+    <StackLayout class="section-header mb-4" style="text-align: center;">
+      <Label text="🚨 Critical Issues" class="section-title"></Label>
+      <Label [text]="criticalFaults.length + ' issues require attention'" class="section-subtitle"></Label>
     </StackLayout>
 
     <!-- Empty State -->
-    <StackLayout *ngIf="faults.length === 0" class="empty-state p-6" backgroundColor="white" borderRadius="16" elevation="1">
+    <StackLayout *ngIf="criticalFaults.length === 0" class="empty-state p-6" backgroundColor="white" borderRadius="16"
+      elevation="1">
       <Label text="✅" class="empty-icon mb-3"></Label>
       <Label text="All Systems Operational" class="empty-title mb-2"></Label>
       <Label text="No faults detected in your infrastructure" class="empty-subtitle mb-1"></Label>
@@ -57,12 +98,9 @@
     </StackLayout>
 
     <!-- Faults List -->
-    <StackLayout *ngFor="let fault of faults; let i = index" 
-                 class="fault-card mb-4 p-4" 
-                 backgroundColor="white" 
-                 borderRadius="16" 
-                 elevation="2">
-      
+    <StackLayout *ngFor="let fault of criticalFaults; let i = index" class="fault-card mb-4 p-4" backgroundColor="white"
+      borderRadius="16" elevation="2">
+
       <!-- Fault Header -->
       <GridLayout columns="auto, *, auto" class="mb-3">
         <Label col="0" [text]="getFaultIcon(fault.type)" class="fault-type-icon mr-3"></Label>
@@ -70,14 +108,13 @@
           <Label [text]="fault.title" class="fault-title mb-1"></Label>
           <Label [text]="fault.location" class="fault-location"></Label>
         </StackLayout>
-        <Label col="2" [text]="fault.severity.toUpperCase()"
-               [backgroundColor]="getSeverityColor(fault.severity)"
-               class="severity-badge" color="white" borderRadius="20"></Label>
+        <Label col="2" [text]="fault.severity.toUpperCase()" [backgroundColor]="getSeverityColor(fault.severity)"
+          class="severity-badge" color="white" borderRadius="20"></Label>
       </GridLayout>
 
       <!-- Fault Description -->
       <Label [text]="fault.description" class="fault-description mb-3" textWrap="true"></Label>
-      
+
       <!-- Fault Footer -->
       <GridLayout columns="*, auto" class="fault-footer">
         <Label col="0" [text]="'🕐 ' + getTimeAgo(fault.timestamp)" class="fault-time"></Label>
