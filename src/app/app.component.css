@@ -1,0 +1,174 @@
+/* Main Container */
+.main-container {
+  background-color: #f0f2f5;
+}
+
+.content-area {
+  background-color: #f0f2f5;
+  padding: 0;
+}
+
+/* Modern Bottom Navigation */
+.bottom-nav {
+  background-color: #ffffff;
+  height: 65;
+  border-top-width: 0.5;
+  border-top-color: rgba(0, 0, 0, 0.08);
+  elevation: 8;
+  padding: 0;
+}
+
+.ios .bottom-nav {
+  shadow-opacity: 0.08;
+  shadow-offset: 0 -2;
+  shadow-radius: 8;
+  shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+.android .bottom-nav {
+  elevation: 12;
+  border-top-color: rgba(0, 0, 0, 0.06);
+}
+
+/* Tab Items */
+.tab-item {
+  padding: 6 4;
+  margin: 2 1;
+  border-radius: 12;
+  vertical-align: center;
+  horizontal-align: center;
+  transition: all 0.25s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.tab-item.active {
+  background-color: rgba(24, 119, 242, 0.08);
+  transform: scale(1.02);
+}
+
+.tab-item:pressed {
+  background-color: rgba(0, 0, 0, 0.04);
+  transform: scale(0.98);
+}
+
+/* Tab Content Container */
+.tab-content {
+  vertical-align: center;
+  horizontal-align: center;
+  padding: 2;
+}
+
+/* Tab Icons */
+.tab-icon {
+  opacity: 0.7;
+  margin-bottom: 3;
+  horizontal-align: center;
+  transition: all 0.25s cubic-bezier(0.4, 0.0, 0.2, 1);
+  transform: scale(1);
+}
+
+.tab-icon.active {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* Tab Labels */
+.tab-label {
+  font-size: 11;
+  font-weight: 500;
+  color: #65676b;
+  text-align: center;
+  horizontal-align: center;
+  margin-top: 1;
+  letter-spacing: 0.1;
+  transition: all 0.25s cubic-bezier(0.4, 0.0, 0.2, 1);
+  opacity: 0.85;
+}
+
+.tab-label.active {
+  color: #1877f2;
+  font-weight: 600;
+  opacity: 1;
+  transform: translateY(-0.5);
+}
+
+/* Tab Indicators */
+.tab-indicator {
+  width: 24;
+  height: 2.5;
+  background-color: transparent;
+  border-radius: 2;
+  horizontal-align: center;
+  margin-top: 4;
+  opacity: 0;
+  transform: scaleX(0);
+  transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.tab-indicator.active {
+  background-color: #1877f2;
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+/* Smooth ripple effect for Android */
+.android .tab-item:pressed {
+  background-color: rgba(24, 119, 242, 0.12);
+  elevation: 2;
+}
+
+/* iOS-style subtle highlight */
+.ios .tab-item:pressed {
+  background-color: rgba(0, 0, 0, 0.06);
+}
+
+/* Enhanced active state */
+.tab-item.active .tab-icon {
+  opacity: 1;
+}
+
+.tab-item.active .tab-label {
+  color: #1877f2;
+}
+
+/* Micro-animations for better UX */
+.tab-item {
+  animation-duration: 0.2s;
+  animation-timing-function: ease-out;
+}
+
+/* Platform-specific refinements */
+.android .tab-label {
+  font-family: "Roboto", sans-serif;
+}
+
+.ios .tab-label {
+  font-family: "SF Pro Text", "Helvetica Neue", sans-serif;
+  font-weight: 500;
+}
+
+/* Accessibility improvements */
+.tab-item:focus {
+  background-color: rgba(24, 119, 242, 0.1);
+  outline-width: 0;
+}
+
+/* Better spacing for different screen sizes */
+@media (max-width: 320) {
+  .tab-label {
+    font-size: 10;
+  }
+  
+  .bottom-nav {
+    height: 60;
+  }
+}
+
+@media (min-width: 414) {
+  .tab-label {
+    font-size: 12;
+  }
+  
+  .bottom-nav {
+    height: 70;
+  }
+}

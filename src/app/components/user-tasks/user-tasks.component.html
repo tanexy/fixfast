@@ -1,0 +1,454 @@
+
+        <ActionBar [title]="userName + ' - Tasks'" backgroundColor="#1E293B" color="white">
+        <NavigationButton text="Back" android.systemIcon="ic_menu_back"></NavigationButton>
+        </ActionBar>
+
+        <ScrollView>
+            <StackLayout class="p-4 bg-gradient">
+
+                <!-- User Info Header -->
+                <StackLayout class="user-header p-4 mb-4" backgroundColor="white" borderRadius="16" elevation="2">
+                    <GridLayout columns="auto, *" rows="auto, auto">
+                        <StackLayout col="0" row="0" rowSpan="2" class="user-avatar mr-3" backgroundColor="#6366f1"
+                            borderRadius="40" width="80" height="80">
+                            <Label [text]="userInitials"
+                                class="avatar-text-large"></Label>
+                        </StackLayout>
+
+                        <StackLayout col="1" row="0">
+                            <Label [text]="userName" class="user-header-name mb-1"></Label>
+                            <Label [text]="userRole" class="user-header-role mb-2"></Label>
+                            <Label [text]="'Total Tasks: ' + stats.totalTasks" class="user-header-stat"></Label>
+                        </StackLayout>
+                    </GridLayout>
+                </StackLayout>
+
+                <!-- Performance Statistics -->
+                <StackLayout class="stats-section mb-4">
+                    <Label text="📊 Performance Overview" class="section-title-main mb-3"></Label>
+
+                    <GridLayout columns="*, *" rows="auto, auto" class="mb-3">
+                        <!-- Completion Rate -->
+                        <StackLayout col="0" row="0" class="stat-card-main p-4 mr-2 mb-2" backgroundColor="white"
+                            borderRadius="16" elevation="2">
+                            <Label text="Completion Rate" class="stat-card-label mb-2"></Label>
+                            <StackLayout orientation="horizontal" verticalAlignment="center">
+                                <Label [text]="stats.completionRate + '%'" class="stat-card-value-large mr-2"></Label>
+                                <Label text="✅" class="stat-card-emoji"></Label>
+                            </StackLayout>
+                            <ProgressBar [value]="stats.completionRate" maxValue="100" backgroundColor="#e5e7eb"
+                                color="#10b981" height="6" class="mt-2"></ProgressBar>
+                        </StackLayout>
+
+                        <!-- On-Time Rate -->
+                        <StackLayout col="1" row="0" class="stat-card-main p-4 ml-2 mb-2" backgroundColor="white"
+                            borderRadius="16" elevation="2">
+                            <Label text="On-Time Rate" class="stat-card-label mb-2"></Label>
+                            <StackLayout orientation="horizontal" verticalAlignment="center">
+                                <Label [text]="stats.onTimeRate + '%'" class="stat-card-value-large mr-2"></Label>
+                                <Label text="⏱️" class="stat-card-emoji"></Label>
+                            </StackLayout>
+                            <ProgressBar [value]="stats.onTimeRate" maxValue="100" backgroundColor="#e5e7eb"
+                                color="#3b82f6" height="6" class="mt-2"></ProgressBar>
+                        </StackLayout>
+
+                        <!-- Average Resolution Time -->
+                        <StackLayout col="0" row="1" class="stat-card-main p-4 mr-2" backgroundColor="white"
+                            borderRadius="16" elevation="2">
+                            <Label text="Avg. Resolution" class="stat-card-label mb-2"></Label>
+                            <StackLayout orientation="horizontal" verticalAlignment="center">
+                                <Label [text]="stats.averageCompletionTime + 'h'"
+                                    class="stat-card-value-large mr-2"></Label>
+                                <Label text="⚡" class="stat-card-emoji"></Label>
+                            </StackLayout>
+                            <Label text="Per Task" class="stat-card-sublabel mt-1"></Label>
+                        </StackLayout>
+
+                        <!-- Total Hours -->
+                        <StackLayout col="1" row="1" class="stat-card-main p-4 ml-2" backgroundColor="white"
+                            borderRadius="16" elevation="2">
+                            <Label text="Total Hours" class="stat-card-label mb-2"></Label>
+                            <StackLayout orientation="horizontal" verticalAlignment="center">
+                                <Label [text]="stats.totalHoursWorked" class="stat-card-value-large mr-2"></Label>
+                                <Label text="🕐" class="stat-card-emoji"></Label>
+                            </StackLayout>
+                            <Label text="Logged" class="stat-card-sublabel mt-1"></Label>
+                        </StackLayout>
+                    </GridLayout>
+                </StackLayout>
+
+                <!-- Task Status Summary -->
+                <GridLayout columns="*, *, *" class="mb-4">
+                    <StackLayout col="0" class="status-summary-card p-3 mr-2" backgroundColor="white" borderRadius="12"
+                        elevation="1">
+                        <Label text="⏳" class="status-summary-icon mb-1"></Label>
+                        <Label [text]="stats.pendingTasks" class="status-summary-number mb-1"></Label>
+                        <Label text="Pending" class="status-summary-label"></Label>
+                    </StackLayout>
+
+                    <StackLayout col="1" class="status-summary-card p-3 mx-1" backgroundColor="white" borderRadius="12"
+                        elevation="1">
+                        <Label text="⚡" class="status-summary-icon mb-1"></Label>
+                        <Label [text]="stats.inProgressTasks" class="status-summary-number mb-1"></Label>
+                        <Label text="In Progress" class="status-summary-label"></Label>
+                    </StackLayout>
+
+                    <StackLayout col="2" class="status-summary-card p-3 ml-2" backgroundColor="white" borderRadius="12"
+                        elevation="1">
+                        <Label text="✓" class="status-summary-icon mb-1"></Label>
+                        <Label [text]="stats.completedTasks" class="status-summary-number mb-1"></Label>
+                        <Label text="Completed" class="status-summary-label"></Label>
+                    </StackLayout>
+                </GridLayout>
+
+                <!-- Filter Buttons -->
+                <ScrollView orientation="horizontal" class="mb-4">
+                    <StackLayout orientation="horizontal">
+                        <Button text="All Tasks" (tap)="filterTasks('all')"
+                            [backgroundColor]="selectedFilter === 'all' ? '#6366f1' : 'white'"
+                            [color]="selectedFilter === 'all' ? 'white' : '#6366f1'" class="filter-btn mr-2"
+                            borderRadius="20" elevation="1"></Button>
+
+                        <Button text="Pending" (tap)="filterTasks('pending')"
+                            [backgroundColor]="selectedFilter === 'pending' ? '#f59e0b' : 'white'"
+                            [color]="selectedFilter === 'pending' ? 'white' : '#f59e0b'" class="filter-btn mr-2"
+                            borderRadius="20" elevation="1"></Button>
+
+                        <Button text="In Progress" (tap)="filterTasks('in-progress')"
+                            [backgroundColor]="selectedFilter === 'in-progress' ? '#3b82f6' : 'white'"
+                            [color]="selectedFilter === 'in-progress' ? 'white' : '#3b82f6'" class="filter-btn mr-2"
+                            borderRadius="20" elevation="1"></Button>
+
+                        <Button text="Completed" (tap)="filterTasks('completed')"
+                            [backgroundColor]="selectedFilter === 'completed' ? '#10b981' : 'white'"
+                            [color]="selectedFilter === 'completed' ? 'white' : '#10b981'" class="filter-btn mr-2"
+                            borderRadius="20" elevation="1"></Button>
+                    </StackLayout>
+                </ScrollView>
+
+                <!-- Tasks List Header -->
+                <StackLayout class="section-header mb-4">
+                    <Label [text]="'📋 Task List (' + filteredTasks.length + ')'" class="section-title"></Label>
+                    <Label text="Track progress and manage assignments" class="section-subtitle"></Label>
+                </StackLayout>
+
+                <!-- Empty State -->
+                <StackLayout *ngIf="filteredTasks.length === 0" class="empty-state p-6" backgroundColor="white"
+                    borderRadius="16" elevation="1">
+                    <Label text="📭" class="empty-icon mb-3"></Label>
+                    <Label text="No Tasks Found" class="empty-title mb-2"></Label>
+                    <Label text="No tasks match the selected filter" class="empty-subtitle"></Label>
+                </StackLayout>
+
+                <!-- Task Cards -->
+                <StackLayout *ngFor="let task of filteredTasks" class="task-card mb-4 p-4" backgroundColor="white"
+                    borderRadius="16" elevation="2">
+
+                    <!-- Task Header -->
+                    <GridLayout columns="auto, *, auto" class="mb-3">
+                        <Label col="0" [text]="getCategoryIcon(task.category)" class="task-category-icon mr-3"></Label>
+
+                        <StackLayout col="1">
+                            <Label [text]="task.title" class="task-title mb-1" textWrap="true"></Label>
+                            <Label [text]="task.id + ' • ' + task.category" class="task-meta"></Label>
+                        </StackLayout>
+
+                        <Label col="2" [text]="task.priority.toUpperCase()"
+                            [backgroundColor]="getPriorityColor(task.priority)" class="priority-badge" color="white"
+                            borderRadius="12"></Label>
+                    </GridLayout>
+
+                    <!-- Task Description -->
+                    <Label [text]="task.description" class="task-description mb-3" textWrap="true"></Label>
+
+                    <!-- Progress Bar -->
+                    <StackLayout class="mb-3">
+                        <GridLayout columns="*, auto" class="mb-1">
+                            <Label col="0" text="Progress" class="progress-label"></Label>
+                            <Label col="1" [text]="task.progress + '%'" class="progress-percentage"></Label>
+                        </GridLayout>
+                        <ProgressBar [value]="task.progress" maxValue="100" backgroundColor="#e5e7eb"
+                            [color]="getProgressColor(task.progress)" height="8" borderRadius="4"></ProgressBar>
+                    </StackLayout>
+
+                    <!-- Task Info Grid -->
+                    <GridLayout columns="*, *" rows="auto, auto" class="task-info-grid mb-3 p-3"
+                        backgroundColor="#f8fafc" borderRadius="12">
+                        <StackLayout col="0" row="0" class="mb-2">
+                            <Label text="📍 Location" class="info-grid-label mb-1"></Label>
+                            <Label [text]="task.location" class="info-grid-value"></Label>
+                        </StackLayout>
+
+                        <StackLayout col="1" row="0" class="mb-2">
+                            <Label text="⏱️ Estimated" class="info-grid-label mb-1"></Label>
+                            <Label [text]="task.estimatedHours + 'h'" class="info-grid-value"></Label>
+                        </StackLayout>
+
+                        <StackLayout col="0" row="1">
+                            <Label text="📅 Assigned" class="info-grid-label mb-1"></Label>
+                            <Label [text]="formatDate(task.assignedDate)" class="info-grid-value"></Label>
+                        </StackLayout>
+
+                        <StackLayout col="1" row="1">
+                            <Label text="⏰ Due Date" class="info-grid-label mb-1"></Label>
+                            <Label [text]="formatDate(task.dueDate)" class="info-grid-value"></Label>
+                        </StackLayout>
+                    </GridLayout>
+
+                    <!-- Status and Due Date -->
+                    <GridLayout columns="*, auto" class="mb-3">
+                        <StackLayout col="0" orientation="horizontal" verticalAlignment="center">
+                            <Label [text]="getStatusIcon(task.status)" [color]="getStatusColor(task.status)"
+                                class="status-icon mr-2"></Label>
+                            <Label [text]="task.status.replace('-', ' ')" [color]="getStatusColor(task.status)"
+                                class="status-text"></Label>
+                        </StackLayout>
+
+                        <Label col="1" [text]="getDueDateText(task.dueDate)"
+                            [color]="getDueDateColor(task.dueDate, task.status)" class="due-date-text"></Label>
+                    </GridLayout>
+
+                    <!-- Action Buttons -->
+                    <GridLayout columns="*, *" class="action-buttons">
+                        <Button col="0" text="📊 View Details" (tap)="viewTaskDetails(task.id)"
+                            class="task-action-btn mr-2" backgroundColor="#f1f5f9" color="#374151"
+                            borderRadius="12"></Button>
+
+                        <Button col="1" text="📝 Update Progress" (tap)="updateTaskProgress(task)"
+                            class="task-action-btn ml-2" backgroundColor="#6366f1" color="white"
+                            borderRadius="12"></Button>
+                    </GridLayout>
+                </StackLayout>
+
+            </StackLayout>
+        </ScrollView>
+
+        <style>
+            /* Background */
+            .bg-gradient {
+                background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            }
+
+            /* User Header */
+            .user-header {
+                border: 1px solid #e2e8f0;
+            }
+
+            .user-avatar {
+                justify-content: center;
+                align-items: center;
+            }
+
+            .avatar-text-large {
+                font-size: 32;
+                font-weight: bold;
+                color: white;
+                text-align: center;
+            }
+
+            .user-header-name {
+                font-size: 22;
+                font-weight: bold;
+                color: #1f2937;
+            }
+
+            .user-header-role {
+                font-size: 14;
+                color: #6b7280;
+            }
+
+            .user-header-stat {
+                font-size: 13;
+                color: #374151;
+                font-weight: 600;
+            }
+
+            /* Section Titles */
+            .section-title-main {
+                font-size: 18;
+                font-weight: bold;
+                color: #1f2937;
+            }
+
+            .section-header {
+                border-left: 4px solid #6366f1;
+                padding-left: 16;
+            }
+
+            .section-title {
+                font-size: 20;
+                font-weight: bold;
+                color: #1f2937;
+            }
+
+            .section-subtitle {
+                font-size: 13;
+                color: #6b7280;
+            }
+
+            /* Statistics Cards */
+            .stat-card-main {
+                border: 1px solid #e2e8f0;
+            }
+
+            .stat-card-label {
+                font-size: 12;
+                color: #6b7280;
+                font-weight: 600;
+            }
+
+            .stat-card-value-large {
+                font-size: 32;
+                font-weight: bold;
+                color: #1f2937;
+            }
+
+            .stat-card-emoji {
+                font-size: 24;
+            }
+
+            .stat-card-sublabel {
+                font-size: 11;
+                color: #9ca3af;
+            }
+
+            /* Status Summary */
+            .status-summary-card {
+                border: 1px solid #e2e8f0;
+                text-align: center;
+            }
+
+            .status-summary-icon {
+                font-size: 24;
+                text-align: center;
+            }
+
+            .status-summary-number {
+                font-size: 22;
+                font-weight: bold;
+                color: #1f2937;
+                text-align: center;
+            }
+
+            .status-summary-label {
+                font-size: 10;
+                color: #6b7280;
+                text-align: center;
+            }
+
+            /* Filter Buttons */
+            .filter-btn {
+                font-size: 13;
+                font-weight: 600;
+                padding: 8 16;
+                min-width: 90;
+            }
+
+            /* Empty State */
+            .empty-icon {
+                font-size: 48;
+                text-align: center;
+            }
+
+            .empty-title {
+                font-size: 18;
+                font-weight: bold;
+                color: #374151;
+                text-align: center;
+            }
+
+            .empty-subtitle {
+                font-size: 14;
+                color: #6b7280;
+                text-align: center;
+            }
+
+            /* Task Cards */
+            .task-card {
+                border: 1px solid #e5e7eb;
+                border-left-width: 4;
+            }
+
+            .task-category-icon {
+                font-size: 28;
+            }
+
+            .task-title {
+                font-size: 17;
+                font-weight: bold;
+                color: #1f2937;
+            }
+
+            .task-meta {
+                font-size: 12;
+                color: #6b7280;
+            }
+
+            .task-description {
+                font-size: 14;
+                color: #4b5563;
+                line-height: 1.5;
+            }
+
+            .priority-badge {
+                font-size: 9;
+                font-weight: bold;
+                padding: 4 8;
+                text-align: center;
+                min-width: 55;
+            }
+
+            /* Progress */
+            .progress-label {
+                font-size: 12;
+                color: #6b7280;
+                font-weight: 600;
+            }
+
+            .progress-percentage {
+                font-size: 13;
+                font-weight: bold;
+                color: #1f2937;
+            }
+
+            /* Task Info Grid */
+            .task-info-grid {
+                border: 1px solid #e2e8f0;
+            }
+
+            .info-grid-label {
+                font-size: 11;
+                color: #6b7280;
+            }
+
+            .info-grid-value {
+                font-size: 13;
+                color: #1f2937;
+                font-weight: 600;
+            }
+
+            /* Status */
+            .status-icon {
+                font-size: 18;
+            }
+
+            .status-text {
+                font-size: 13;
+                font-weight: 600;
+                text-transform: capitalize;
+            }
+
+            .due-date-text {
+                font-size: 12;
+                font-weight: 600;
+            }
+
+            /* Action Buttons */
+            .task-action-btn {
+                font-size: 13;
+                font-weight: 600;
+                padding: 10;
+                elevation: 1;
+            }
+        </style>
+        

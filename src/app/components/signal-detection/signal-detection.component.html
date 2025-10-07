@@ -1,89 +1,170 @@
-<ActionBar title="Network Status" backgroundColor="#2196F3" color="white">
+<ActionBar title="Network Status" backgroundColor="#1E293B" color="white">
   <ActionItem text="Refresh" (tap)="loadNetworkInfo()" ios.position="right" android.position="actionBar"></ActionItem>
 </ActionBar>
 
 <ScrollView>
-  <StackLayout class="p-4">
+  <StackLayout class="network-container">
 
-    <!-- Current Network Status -->
-    <Label text="Current Network" class="text-xl font-bold text-primary mb-4"></Label>
+    <!-- Network Status Overview Card -->
+    <StackLayout class="status-header-section">
+      <StackLayout *ngIf="networkInfo" class="network-status-card">
 
-    <GridLayout *ngIf="networkInfo" class="network-status-card mb-4 p-4" backgroundColor="white" borderRadius="8">
-      <StackLayout>
+        <!-- Connection Header -->
+        <GridLayout columns="auto, *, auto" class="connection-header">
+          <StackLayout col="0" class="connection-icon-wrapper">
+            <Label [text]="getConnectionTypeIcon(networkInfo.connectionType)" class="connection-icon"></Label>
+          </StackLayout>
 
-        <!-- Connection Status -->
-        <GridLayout columns="auto, *, auto" class="mb-3">
-          <Label col="0" [text]="getConnectionTypeIcon(networkInfo.connectionType)" class="text-2xl mr-3"></Label>
-          <StackLayout col="1">
-            <Label [text]="networkInfo.connectionType.toUpperCase()" class="text-lg font-bold"></Label>
+          <StackLayout col="1" class="connection-info">
+            <Label [text]="networkInfo.connectionType.toUpperCase()" class="connection-type"></Label>
             <Label [text]="networkInfo.isConnected ? 'Connected' : 'Disconnected'"
-              [color]="networkInfo.isConnected ? '#4CAF50' : '#F44336'"></Label>
+              [color]="networkInfo.isConnected ? '#4CAF50' : '#F44336'" class="connection-status"></Label>
+            <Label *ngIf="networkInfo.provider" [text]="networkInfo.provider" class="provider-label"></Label>
           </StackLayout>
-          <Label col="2" [text]="networkInfo.timestamp | date:'HH:mm'" class="text-sm text-gray-500"></Label>
+
+          <StackLayout col="2" class="timestamp-section">
+            <Label [text]="getConnectionStatusIcon(networkInfo.isConnected)" class="status-icon"></Label>
+            <Label [text]="networkInfo.timestamp | date:'HH:mm:ss'" class="timestamp-value"></Label>
+          </StackLayout>
         </GridLayout>
 
-        <!-- Signal Strength -->
-        <GridLayout columns="*, auto" class="mb-3">
-          <StackLayout col="0">
-            <Label text="Signal Strength" class="text-sm text-gray-600"></Label>
+        <!-- Signal Strength Section -->
+        <StackLayout class="signal-section">
+          <GridLayout columns="*, auto" class="signal-header">
+            <Label col="0" text="Signal Strength" class="signal-title"></Label>
+            <Label col="1" [text]="networkInfo.signalStrength + '%'"
+              [color]="getSignalStrengthColor(networkInfo.signalStrength)" class="signal-percentage"></Label>
+          </GridLayout>
+
+          <StackLayout class="signal-bar-container">
+            <StackLayout class="signal-bar-background">
+              <StackLayout [width]="networkInfo.signalStrength + '%'"
+                [backgroundColor]="getSignalStrengthColor(networkInfo.signalStrength)" class="signal-bar-fill">
+              </StackLayout>
+            </StackLayout>
             <Label [text]="getSignalStrengthText(networkInfo.signalStrength)"
-              [color]="getSignalStrengthColor(networkInfo.signalStrength)" class="font-bold"></Label>
+              [color]="getSignalStrengthColor(networkInfo.signalStrength)" class="signal-strength-text"></Label>
           </StackLayout>
-          <Label col="1" [text]="networkInfo.signalStrength + '%'"
-            [color]="getSignalStrengthColor(networkInfo.signalStrength)" class="text-2xl font-bold"></Label>
-        </GridLayout>
+        </StackLayout>
 
-        <!-- Speed Metrics -->
-        <GridLayout columns="*, *, *" class="speed-metrics">
-          <StackLayout col="0" class="metric-item">
-            <Label text="⬇ Download" class="text-xs text-gray-500"></Label>
-            <Label [text]="formatSpeed(networkInfo.downloadSpeed)" class="text-lg font-bold"></Label>
-          </StackLayout>
-          <StackLayout col="1" class="metric-item">
-            <Label text="⬆ Upload" class="text-xs text-gray-500"></Label>
-            <Label [text]="formatSpeed(networkInfo.uploadSpeed)" class="text-lg font-bold"></Label>
-          </StackLayout>
-          <StackLayout col="2" class="metric-item">
-            <Label text="⚡ Latency" class="text-xs text-gray-500"></Label>
-            <Label [text]="networkInfo.latency + 'ms'" class="text-lg font-bold"></Label>
-          </StackLayout>
-        </GridLayout>
+        <!-- IP Address -->
+        <StackLayout *ngIf="networkInfo.ipAddress" class="ip-section">
+          <Label text="🌐 IP Address" class="ip-label"></Label>
+          <Label [text]="networkInfo.ipAddress" class="ip-value"></Label>
+        </StackLayout>
 
       </StackLayout>
-    </GridLayout>
-
-    <!-- Speed Test Button -->
-    <Button text="Run Speed Test" (tap)="runSpeedTest()" [isEnabled]="!isTestingSpeed"
-      class="btn-primary btn-large mb-4"></Button>
-
-    <StackLayout *ngIf="isTestingSpeed" class="testing-indicator mb-4">
-      <ActivityIndicator busy="true" class="mb-2"></ActivityIndicator>
-      <Label text="Running speed test..." class="text-center text-gray-600"></Label>
     </StackLayout>
 
-    <!-- Test History -->
-    <Label text="Recent Tests" class="text-lg font-bold text-primary mb-3"></Label>
+    <!-- Network Metrics Cards -->
+    <StackLayout class="section-container">
+      <Label text="Network Metrics" class="section-title"></Label>
 
-    <StackLayout *ngIf="testHistory.length === 0" class="empty-state p-4">
-      <Label text="📊" class="text-4xl text-center mb-2"></Label>
-      <Label text="No test history" class="text-center text-gray-500"></Label>
-      <Label text="Run a speed test to see results" class="text-center text-sm text-gray-400"></Label>
-    </StackLayout>
-
-    <StackLayout *ngFor="let test of testHistory" class="history-item mb-2 p-3" backgroundColor="white"
-      borderRadius="6">
-      <GridLayout columns="*, auto">
-        <StackLayout col="0">
-          <GridLayout columns="*, *, *">
-            <Label col="0" [text]="'⬇ ' + formatSpeed(test.downloadSpeed)" class="text-sm"></Label>
-            <Label col="1" [text]="'⬆ ' + formatSpeed(test.uploadSpeed)" class="text-sm"></Label>
-            <Label col="2" [text]="test.latency + 'ms'" class="text-sm"></Label>
-          </GridLayout>
-          <Label [text]="test.connectionType + ' • ' + getSignalStrengthText(test.signalStrength)"
-            class="text-xs text-gray-500 mt-1"></Label>
+      <GridLayout columns="*, *, *" class="metrics-grid">
+        <!-- Ping/Latency -->
+        <StackLayout col="0" class="metric-card">
+          <Label text="⚡" class="metric-icon"></Label>
+          <Label text="Ping" class="metric-label"></Label>
+          <Label [text]="networkMetrics.ping + 'ms'" class="metric-value"></Label>
+          <Label [text]="getPingQuality(networkMetrics.ping)" [color]="getPingColor(networkMetrics.ping)"
+            class="metric-status"></Label>
         </StackLayout>
-        <Label col="1" [text]="test.timestamp | date:'MM/dd HH:mm'" class="text-xs text-gray-400"></Label>
+
+        <!-- Uptime -->
+        <StackLayout col="1" class="metric-card metric-card-center">
+          <Label text="⏱️" class="metric-icon"></Label>
+          <Label text="Uptime" class="metric-label"></Label>
+          <Label [text]="formatUptime(networkMetrics.uptime)" class="metric-value"></Label>
+          <Label text="Active" color="#4CAF50" class="metric-status"></Label>
+        </StackLayout>
+
+        <!-- Packet Loss -->
+        <StackLayout col="2" class="metric-card">
+          <Label text="📊" class="metric-icon"></Label>
+          <Label text="Packet Loss" class="metric-label"></Label>
+          <Label [text]="networkMetrics.packetLoss + '%'" class="metric-value"></Label>
+          <Label [text]="getPacketLossStatus(networkMetrics.packetLoss)"
+            [color]="getPacketLossColor(networkMetrics.packetLoss)" class="metric-status"></Label>
+        </StackLayout>
       </GridLayout>
+    </StackLayout>
+
+    <!-- System Health Status -->
+    <StackLayout class="section-container">
+      <Label text="System Health" class="section-title"></Label>
+
+      <StackLayout class="health-card">
+        <GridLayout columns="*, *" class="health-grid">
+          <StackLayout col="0" class="health-item">
+            <Label text="🔄" class="health-icon"></Label>
+            <Label text="Connection Stability" class="health-label"></Label>
+            <Label [text]="networkMetrics.packetLoss === 0 ? 'Stable' : 'Unstable'"
+              [color]="networkMetrics.packetLoss === 0 ? '#4CAF50' : '#FF9800'" class="health-value"></Label>
+          </StackLayout>
+
+          <StackLayout col="1" class="health-item">
+            <Label text="🎯" class="health-icon"></Label>
+            <Label text="Network Quality" class="health-label"></Label>
+            <Label [text]="getPingQuality(networkMetrics.ping)" [color]="getPingColor(networkMetrics.ping)"
+              class="health-value"></Label>
+          </StackLayout>
+        </GridLayout>
+      </StackLayout>
+    </StackLayout>
+
+    <!-- Connection History -->
+    <StackLayout class="section-container">
+      <Label text="Connection History" class="section-title"></Label>
+
+      <StackLayout *ngIf="connectionHistory.length === 0" class="empty-state-card">
+        <Label text="📝" class="empty-icon"></Label>
+        <Label text="No Connection Changes" class="empty-title"></Label>
+        <Label text="Your network connection has been stable. Any changes will be logged here."
+          class="empty-subtitle"></Label>
+      </StackLayout>
+
+      <StackLayout *ngFor="let connection of connectionHistory" class="history-card">
+        <GridLayout columns="auto, *, auto" class="history-header">
+          <Label col="0" [text]="getConnectionTypeIcon(connection.connectionType)" class="history-icon"></Label>
+
+          <StackLayout col="1" class="history-info">
+            <Label [text]="connection.connectionType.toUpperCase()" class="history-connection"></Label>
+            <Label [text]="connection.isConnected ? 'Connected' : 'Disconnected'"
+              [color]="connection.isConnected ? '#4CAF50' : '#F44336'" class="history-status"></Label>
+          </StackLayout>
+
+          <StackLayout col="2" class="history-time">
+            <Label [text]="connection.timestamp | date:'HH:mm:ss'" class="history-timestamp"></Label>
+            <Label [text]="connection.timestamp | date:'MMM dd'" class="history-date"></Label>
+          </StackLayout>
+        </GridLayout>
+
+        <StackLayout class="history-details">
+          <GridLayout columns="*, *" class="history-metrics">
+            <StackLayout col="0" class="history-metric">
+              <Label text="Signal:" class="history-metric-label"></Label>
+              <Label [text]="connection.signalStrength + '%'"
+                [color]="getSignalStrengthColor(connection.signalStrength)" class="history-metric-value"></Label>
+            </StackLayout>
+            <StackLayout col="1" class="history-metric">
+              <Label text="Quality:" class="history-metric-label"></Label>
+              <Label [text]="getSignalStrengthText(connection.signalStrength)"
+                [color]="getSignalStrengthColor(connection.signalStrength)" class="history-metric-value"></Label>
+            </StackLayout>
+          </GridLayout>
+        </StackLayout>
+      </StackLayout>
+    </StackLayout>
+
+    <!-- Diagnostic Info -->
+    <StackLayout class="section-container">
+      <StackLayout class="diagnostic-card">
+        <Label text="ℹ️ Diagnostic Information" class="diagnostic-title"></Label>
+        <Label
+          text="Network monitoring active. Connection changes and quality metrics are logged automatically for troubleshooting purposes."
+          class="diagnostic-text"></Label>
+        <Label *ngIf="isRefreshing" text="🔄 Refreshing..." class="diagnostic-status"></Label>
+      </StackLayout>
     </StackLayout>
 
   </StackLayout>

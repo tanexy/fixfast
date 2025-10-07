@@ -1,96 +1,341 @@
-.form-group {
+/* General page */
+.p-4 {
+  padding: 16;
+}
+
+/* Header */
+.report-header {
   margin-bottom: 16;
+  text-align: center;
+}
+.header-title {
+  font-size: 20;
+  font-weight: bold;
+  color: #1e293b;
+}
+.header-subtitle {
+  font-size: 14;
+  color: #64748b;
+  margin-top: 4;
+}
+
+/* Form cards */
+.form-card {
+  background-color: #ffffff;
+  border-radius: 12;
+  padding: 16;
+  margin-bottom: 16;
+  shadow-color: #000;
+  shadow-opacity: 0.1;
+  shadow-radius: 4;
+  elevation: 2;
 }
 
 .form-label {
-  color: #333333;
   font-size: 14;
-  font-weight: bold;
-  margin-bottom: 4;
+  font-weight: 600;
+  margin-bottom: 8;
+  color: #334155;
 }
 
-.form-input, .form-textarea {
-  background-color: white;
-  border-radius: 8;
-  border-width: 1;
-  border-color: #E0E0E0;
-  padding: 12;
-  font-size: 16;
+.form-label.required::after {
+  content: " *";
+  color: #dc2626;
 }
 
-.form-input:focus, .form-textarea:focus {
-  border-color: #2196F3;
-}
-
-.severity-grid {
+/* Task List Selection */
+.task-list {
   margin-top: 8;
 }
 
-.btn-severity {
-  font-size: 12;
-  padding: 8;
-  margin: 2;
-  border-radius: 6;
-  background-color: #F5F5F5;
-  color: #666666;
+.task-card {
+  background-color: #f8fafc;
+  border-radius: 10;
+  padding: 14;
+  margin-bottom: 12;
   border-width: 1;
-  border-color: #E0E0E0;
+  border-color: #e2e8f0;
 }
 
-.btn-severity.active {
-  background-color: #2196F3;
-  color: white;
-  border-color: #2196F3;
+.task-card:active {
+  background-color: #e2e8f0;
 }
 
-.section-header {
+.task-header {
+  margin-bottom: 8;
+}
+
+.task-card-title {
   font-size: 16;
   font-weight: bold;
-  color: #2196F3;
-  margin-top: 16;
+  color: #0f172a;
 }
 
-.attachment-item {
-  background-color: #F8F8F8;
-  border-radius: 4;
-  padding: 8;
+.task-priority {
+  font-size: 11;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5;
 }
 
-.btn-remove {
-  background-color: #F44336;
-  color: white;
-  border-radius: 12;
-  width: 24;
-  height: 24;
+.task-info {
+  margin-top: 8;
+  margin-bottom: 8;
+}
+
+.task-info-row {
+  margin-bottom: 4;
+}
+
+.task-icon {
+  font-size: 14;
+  margin-right: 4;
+}
+
+.task-location-text {
+  font-size: 13;
+  color: #475569;
+}
+
+.task-date {
   font-size: 12;
+  color: #64748b;
 }
 
-.btn-primary {
-  background-color: #2196F3;
-  color: white;
-  font-size: 16;
-  border-radius: 8;
-  padding: 16;
-  font-weight: bold;
+.task-due {
+  font-size: 12;
+  color: #64748b;
 }
 
-.btn-secondary {
-  background-color: #FF9800;
-  color: white;
+.task-due-urgent {
+  font-size: 12;
+  color: #dc2626;
+  font-weight: 600;
+}
+
+.task-action-hint {
+  font-size: 12;
+  color: #3b82f6;
+  text-align: right;
+  margin-top: 4;
+  font-style: italic;
+}
+
+/* Selected Task Display */
+.selected-task-display {
+  border-width: 2;
+  border-color: #3b82f6;
+}
+
+.btn-change-task {
+  background-color: #f1f5f9;
+  color: #3b82f6;
+  font-size: 12;
+  padding: 6 12;
   border-radius: 6;
-  padding: 8;
+  font-weight: 600;
 }
 
-.btn-small {
+.selected-task-info {
+  margin-top: 12;
+  padding-top: 12;
+  border-top-width: 1;
+  border-top-color: #e2e8f0;
+}
+
+.selected-task-title {
+  font-size: 16;
+  font-weight: bold;
+  color: #0f172a;
+}
+
+.selected-task-location {
+  font-size: 13;
+  color: #64748b;
+  margin-top: 2;
+}
+
+/* Status buttons */
+.status-grid {
+  margin-top: 8;
+}
+.btn-status {
+  margin: 4;
+  border-radius: 8;
+  font-size: 13;
+  padding: 10;
+  background-color: #e2e8f0;
+  color: #334155;
+  font-weight: 500;
+}
+.btn-status.active {
+  background-color: #1e293b;
+  color: #ffffff;
+  font-weight: 600;
+}
+.status-not-started {
+  background-color: #f1f5f9;
+}
+.status-in-progress {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+.status-done {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+.btn-status.active.status-not-started {
+  background-color: #64748b;
+}
+.btn-status.active.status-in-progress {
+  background-color: #f59e0b;
+}
+.btn-status.active.status-done {
+  background-color: #10b981;
+}
+
+/* Progress slider */
+.progress-percentage {
+  font-size: 16;
+  font-weight: bold;
+  color: #0f172a;
+}
+.progress-slider {
+  margin-top: 8;
+  margin-bottom: 4;
+}
+.slider-labels {
+  margin-top: 4;
+}
+.slider-label {
+  font-size: 11;
+  color: #94a3b8;
+}
+
+/* Text inputs */
+.form-textarea {
+  background-color: #f8fafc;
+  border-radius: 8;
+  padding: 12;
+  font-size: 14;
+  border-width: 1;
+  border-color: #e2e8f0;
+  margin-top: 8;
+  color: #0f172a;
+}
+
+/* Time inputs */
+.time-grid {
+  margin-top: 8;
+  column-gap: 8;
+}
+
+.time-label {
+  font-size: 14;
+  color: #475569;
+  margin-right: 8;
+}
+
+.time-input {
+  background-color: #f8fafc;
+  border-radius: 8;
+  padding: 8;
+  font-size: 14;
+  border-width: 1;
+  border-color: #e2e8f0;
+  text-align: center;
+}
+
+/* Photo section */
+.btn-photo {
+  background-color: #1e293b;
+  color: white;
   font-size: 12;
-  padding: 8;
+  border-radius: 8;
+  padding: 8 12;
+  font-weight: 600;
 }
 
-.btn-large {
+.photos-grid {
+  margin-top: 12;
+}
+
+.photo-item {
+  background-color: #f8fafc;
+  border-radius: 8;
+  padding: 10;
+  margin-bottom: 6;
+  align-items: center;
+}
+
+.photo-icon {
+  font-size: 20;
+  margin-right: 8;
+}
+
+.photo-name {
+  font-size: 13;
+  color: #0f172a;
+}
+
+.btn-remove-photo {
+  background-color: transparent;
+  color: #dc2626;
   font-size: 18;
-  padding: 16;
+  width: 32;
+  height: 32;
+  border-radius: 16;
+  padding: 0;
 }
 
-.text-primary {
-  color: #2196F3;
+.no-photos-message {
+  font-size: 13;
+  color: #94a3b8;
+  text-align: center;
+  padding: 12;
+  font-style: italic;
+}
+
+/* Submit */
+.submit-section {
+  margin-top: 24;
+  margin-bottom: 32;
+}
+
+.submit-actions {
+  column-gap: 8;
+}
+
+.btn-cancel-submit {
+  background-color: #f1f5f9;
+  color: #475569;
+  font-size: 15;
+  padding: 12;
+  border-radius: 8;
+  font-weight: 600;
+}
+
+.btn-submit {
+  background-color: #1e293b;
+  color: white;
+  font-size: 15;
+  padding: 12;
+  border-radius: 8;
+  font-weight: 600;
+}
+
+.btn-submit.disabled {
+  background-color: #cbd5e1;
+  color: #475569;
+}
+
+.loading-indicator {
+  margin-top: 12;
+}
+
+.loading-text {
+  margin-top: 8;
+  text-align: center;
+  font-size: 14;
+  color: #475569;
 }

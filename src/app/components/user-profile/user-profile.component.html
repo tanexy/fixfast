@@ -1,83 +1,109 @@
-<ActionBar title="Profile" backgroundColor="#2196F3" color="white">
-  <ActionItem text="Edit" (tap)="editProfile()" ios.position="right" android.position="actionBar"></ActionItem>
-</ActionBar>
+<ActionBar title="Profile" backgroundColor="#1E293B" color="white"></ActionBar>
 
-<ScrollView>
-  <StackLayout class="p-4">
-    <!-- Profile Header -->
-    <StackLayout class="profile-header mb-4 p-4" backgroundColor="white" borderRadius="8">
-      <GridLayout columns="auto, *" class="mb-3">
-        <Label col="0" text="👤" class="profile-avatar mr-3"></Label>
-        <StackLayout col="1">
-          <Label [text]="profile.name" class="text-xl font-bold"></Label>
-          <Label [text]="profile.email" class="text-sm text-gray-600"></Label>
-          <Label [text]="profile.role + ' • ' + profile.department" class="text-sm text-primary"></Label>
+<ScrollView backgroundColor="#F8FAFC">
+  <StackLayout class="profile-container">
+
+    <!-- Modern Profile Header -->
+    <StackLayout class="profile-header">
+      <GridLayout rows="auto, auto" class="header-content">
+        <!-- Avatar and Basic Info -->
+        <StackLayout row="0" class="avatar-container">
+          <Label [text]="getInitials()" class="avatar-circle"></Label>
+          <Label text="✏️" class="edit-badge" (tap)="editProfile()"></Label>
+        </StackLayout>
+
+        <StackLayout row="1" class="profile-details">
+          <Label [text]="profile.Username" class="profile-name"></Label>
+          <Label [text]="profile.Email" class="profile-email"></Label>
+
+          <GridLayout columns="auto, auto" class="profile-meta">
+            <StackLayout col="0" class="meta-item">
+              <Label [text]="profile.Role" class="meta-badge role-badge"></Label>
+            </StackLayout>
+            <StackLayout col="1" class="meta-item">
+              <Label [text]="" class="meta-badge dept-badge">N/A</Label>
+            </StackLayout>
+          </GridLayout>
         </StackLayout>
       </GridLayout>
-
-      <Label [text]="'Member since ' + (profile.joinDate | date : 'MMMM yyyy')" class="text-xs text-gray-500"></Label>
     </StackLayout>
 
-    <!-- Statistics Cards -->
-    <Label text="Your Statistics" class="text-lg font-bold text-primary mb-3"></Label>
-
-    <GridLayout columns="*, *" class="stats-grid mb-4">
-      <StackLayout col="0" class="stat-card mr-2 p-3" backgroundColor="white" borderRadius="8">
-        <Label text="📊" class="text-2xl text-center mb-1"></Label>
-        <Label [text]="profile.totalTicketsReported.toString()" class="text-xl font-bold text-center"></Label>
-        <Label text="Total Reports" class="text-xs text-center text-gray-600"></Label>
+    <!-- Stats Overview Cards -->
+    <GridLayout columns="*, *, *" class="stats-row">
+      <StackLayout col="0" class="stat-mini-card">
+        <Label [text]="" class="stat-mini-number">5</Label>
+        <Label text="Reported" class="stat-mini-label"></Label>
       </StackLayout>
 
-      <StackLayout col="1" class="stat-card ml-2 p-3" backgroundColor="white" borderRadius="8">
-        <Label text="✅" class="text-2xl text-center mb-1"></Label>
-        <Label [text]="profile.totalTicketsResolved.toString()" class="text-xl font-bold text-center"></Label>
-        <Label text="Resolved" class="text-xs text-center text-gray-600"></Label>
-      </StackLayout>
-    </GridLayout>
-
-    <GridLayout columns="*, *" class="stats-grid mb-4">
-      <StackLayout col="0" class="stat-card mr-2 p-3" backgroundColor="white" borderRadius="8">
-        <Label text="📅" class="text-2xl text-center mb-1"></Label>
-        <Label [text]="stats.ticketsThisMonth.toString()" class="text-xl font-bold text-center"></Label>
-        <Label text="This Month" class="text-xs text-center text-gray-600"></Label>
+      <StackLayout col="1" class="stat-mini-card stat-mini-middle">
+        <Label [text]="" class="stat-mini-number">6</Label>
+        <Label text="Resolved" class="stat-mini-label"></Label>
       </StackLayout>
 
-      <StackLayout col="1" class="stat-card ml-2 p-3" backgroundColor="white" borderRadius="8">
-        <Label text="⏱" class="text-2xl text-center mb-1"></Label>
-        <Label [text]="stats.averageResolutionTime + ' days'" class="text-xl font-bold text-center"></Label>
-        <Label text="Avg Resolution" class="text-xs text-center text-gray-600"></Label>
+      <StackLayout col="2" class="stat-mini-card">
+        <Label [text]="stats.ticketsThisMonth.toString()" class="stat-mini-number"></Label>
+        <Label text="This Month" class="stat-mini-label"></Label>
       </StackLayout>
     </GridLayout>
+
+    <!-- Quick Actions Grid -->
+    <StackLayout class="section-wrapper">
+      <Label text="Quick Actions" class="section-header"></Label>
+
+      <GridLayout columns="*, *" rows="auto, auto" class="quick-actions-grid">
+        <StackLayout *ngFor="let action of quickActions; let i = index" [col]="i % 2" [row]="i < 2 ? 0 : 1"
+          class="quick-action-card" (tap)="onQuickAction(action)">
+          <Label [text]="action.icon" class="action-icon"></Label>
+          <Label [text]="action.label" class="action-label"></Label>
+        </StackLayout>
+      </GridLayout>
+    </StackLayout>
 
     <!-- Recent Activity -->
-    <Label text="Recent Tickets" class="text-lg font-bold text-primary mb-3"></Label>
-
-    <StackLayout *ngIf="recentTickets.length === 0" class="empty-state p-4">
-      <Label text="📋" class="text-4xl text-center mb-2"></Label>
-      <Label text="No recent tickets" class="text-center text-gray-500"></Label>
-    </StackLayout>
-
-    <StackLayout *ngFor="let ticket of recentTickets" class="ticket-item mb-2 p-3" backgroundColor="white"
-      borderRadius="6">
-      <GridLayout columns="*, auto">
-        <StackLayout col="0">
-          <Label [text]="ticket.title" class="text-sm font-bold mb-1"></Label>
-          <Label [text]="ticket.location" class="text-xs text-gray-600"></Label>
-        </StackLayout>
-        <StackLayout col="1" class="text-right">
-          <Label [text]="ticket.status.replace('-', ' ').toUpperCase()"
-            [backgroundColor]="getTicketStatusColor(ticket.status)"
-            class="status-badge text-white text-center mb-1"></Label>
-          <Label [text]="ticket.createdAt | date : 'MM/dd'" class="text-xs text-gray-400"></Label>
-        </StackLayout>
+    <StackLayout class="section-wrapper" *ngIf="recentTickets.length > 0">
+      <GridLayout columns="*, auto" class="section-header-row">
+        <Label col="0" text="Recent Activity" class="section-header"></Label>
+        <Label col="1" text="View All →" class="view-all-link" (tap)="navigateTo('/tickets')"></Label>
       </GridLayout>
+
+      <StackLayout class="activity-list">
+        <GridLayout *ngFor="let ticket of recentTickets" columns="auto, *, auto" class="activity-item"
+          (tap)="navigateTo('/tickets')">
+
+          <Label col="0" text="📋" class="activity-icon"></Label>
+
+          <StackLayout col="1" class="activity-info">
+            <Label [text]="ticket.title" class="activity-title"></Label>
+            <Label [text]="ticket.location + ' • ' + (ticket.createdAt | date:'MMM dd')"
+              class="activity-subtitle"></Label>
+          </StackLayout>
+
+          <Label col="2" [text]="ticket.status.replace('-', ' ')"
+            [backgroundColor]="getTicketStatusColor(ticket.status)" class="activity-status"></Label>
+        </GridLayout>
+      </StackLayout>
     </StackLayout>
 
-    <!-- Actions -->
-    <StackLayout class="actions-section mt-4">
-      <Button text="Settings " class="btn-secondary btn-large mb-2"></Button>
-      <Button text="Help & Support " class="btn-secondary btn-large mb-2"></Button>
-      <Button text="Logout" (tap)="logout()" class="btn-outline btn-large"></Button>
+    <!-- Menu Items -->
+    <StackLayout class="section-wrapper">
+      <Label text="Settings & More" class="section-header"></Label>
+
+      <StackLayout class="menu-list">
+        <GridLayout *ngFor="let item of menuItems" columns="auto, *, auto" class="menu-item"
+          (tap)="onMenuItem(item.action)">
+
+          <Label col="0" [text]="item.icon" class="menu-icon"></Label>
+          <Label col="1" [text]="item.label" class="menu-label"></Label>
+          <Label col="2" text="›" class="menu-arrow"></Label>
+        </GridLayout>
+      </StackLayout>
     </StackLayout>
+
+    <!-- Logout Button 'Member since ' + (profile.joinDate | date:'MMMM yyyy') -->
+    <StackLayout class="logout-section">
+      <Button text="Logout" (tap)="logout()" class="btn-logout"></Button>
+      <Label [text]="" class="member-since"></Label>
+    </StackLayout>
+
   </StackLayout>
 </ScrollView>

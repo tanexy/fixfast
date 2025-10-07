@@ -1,72 +1,166 @@
-<ActionBar title="Report Issue" backgroundColor="#2196F3" color="white"></ActionBar>
+<ActionBar title="Progress Update" backgroundColor="#1E293B" color="white"></ActionBar>
 
-<ScrollView>
+<ScrollView backgroundColor="#F8FAFC">
   <StackLayout class="p-4">
 
-    <Label text="Report a New Issue" class="text-xl font-bold text-primary mb-4"></Label>
-
-    <!-- Title Field -->
-    <StackLayout class="form-group mb-4">
-      <Label text="Issue Title *" class="form-label"></Label>
-      <TextField [(ngModel)]="report.title" hint="Brief description of the issue" class="form-input"></TextField>
+    <!-- Header Section -->
+    <StackLayout class="report-header">
+      <Label text="Task Progress Report" class="header-title"></Label>
+      <Label text="Update your manager on task completion status" class="header-subtitle"></Label>
     </StackLayout>
 
-    <!-- Description Field -->
-    <StackLayout class="form-group mb-4">
-      <Label text="Description *" class="form-label"></Label>
-      <TextView [(ngModel)]="report.description" hint="Detailed description of the problem" class="form-textarea"
-        height="100"></TextView>
-    </StackLayout>
+    <!-- Task Selection View (when no task selected) -->
+    <StackLayout *ngIf="!showReportForm" class="form-card">
+      <Label text="Select a Task to Report On" class="form-label"></Label>
 
-    <!-- Location Field -->
-    <StackLayout class="form-group mb-4">
-      <Label text="Location *" class="form-label"></Label>
-      <TextField [(ngModel)]="report.location" hint="Building, floor, room number" class="form-input"></TextField>
-    </StackLayout>
+      <StackLayout class="task-list">
+        <StackLayout *ngFor="let task of assignedTasks" class="task-card" (tap)="selectTask(task)">
 
-    <!-- Severity Selection -->
-    <StackLayout class="form-group mb-4">
-      <Label text="Priority Level" class="form-label mb-2"></Label>
-      <GridLayout columns="*, *, *, *" class="severity-grid">
-        <Button *ngFor="let option of severityOptions; let i = index" [col]="i" [text]="option.display"
-          [class]="report.severity === option.key ? 'btn-severity active' : 'btn-severity'"
-          (tap)="report.severity = option.key"></Button>
-      </GridLayout>
-    </StackLayout>
+          <!-- Task Header -->
+          <GridLayout columns="*, auto" class="task-header">
+            <Label col="0" [text]="task.title" class="task-card-title"></Label>
+            <Label col="1" [text]="task.priority" [style.color]="getPriorityColor(task.priority)"
+              class="task-priority"></Label>
+          </GridLayout>
 
-    <!-- Reporter Information -->
-    <Label text="Contact Information" class="section-header mb-3"></Label>
+          <!-- Task Info -->
+          <StackLayout class="task-info">
+            <GridLayout columns="auto, *" class="task-info-row">
+              <Label col="0" text="📍 " class="task-icon"></Label>
+              <Label col="1" [text]="task.location" class="task-location-text"></Label>
+            </GridLayout>
 
-    <StackLayout class="form-group mb-4">
-      <Label text="Your Name" class="form-label"></Label>
-      <TextField [(ngModel)]="report.reporterName" hint="Full name" class="form-input"></TextField>
-    </StackLayout>
+            <GridLayout columns="auto, *" class="task-info-row">
+              <Label col="0" text="📅 " class="task-icon"></Label>
+              <Label col="1" [text]="'Assigned: ' + (task.assignedDate | date:'MMM d, yyyy')" class="task-date"></Label>
+            </GridLayout>
 
-    <StackLayout class="form-group mb-4">
-      <Label text="Contact Info" class="form-label"></Label>
-      <TextField [(ngModel)]="report.reporterContact" hint="Email or phone number" class="form-input"></TextField>
-    </StackLayout>
+            <GridLayout columns="auto, *" class="task-info-row">
+              <Label col="0" text="⏰ " class="task-icon"></Label>
+              <Label col="1" [text]="getDaysUntilDue(task.dueDate)"
+                [class]="getDaysUntilDue(task.dueDate).includes('Overdue') || getDaysUntilDue(task.dueDate).includes('today') ? 'task-due-urgent' : 'task-due'"></Label>
+            </GridLayout>
+          </StackLayout>
 
-    <!-- Attachments Section -->
-    <StackLayout class="form-group mb-4">
-      <GridLayout columns="*, auto">
-        <Label col="0" text="Attachments" class="form-label"></Label>
-        <Button col="1" text="+ Add Photo" (tap)="addAttachment()" class="btn-secondary btn-small"></Button>
-      </GridLayout>
-
-      <StackLayout *ngFor="let attachment of report.attachments; let i = index" class="attachment-item mt-2">
-        <GridLayout columns="*, auto">
-          <Label [col]="0" [text]="'📎 ' + attachment" class="text-sm"></Label>
-          <Button [col]="1" text="✕" (tap)="removeAttachment(i)" class="btn-remove"></Button>
-        </GridLayout>
+          <Label text="Tap to create progress report →" class="task-action-hint"></Label>
+        </StackLayout>
       </StackLayout>
     </StackLayout>
 
-    <!-- Submit Button -->
-    <Button text="Submit Report" (tap)="onSubmit()" [isEnabled]="!isSubmitting"
-      class="btn-primary btn-large mt-4"></Button>
+    <!-- Report Form (when task selected) -->
+    <StackLayout *ngIf="showReportForm">
 
-    <ActivityIndicator [busy]="isSubmitting" class="mt-2"></ActivityIndicator>
+      <!-- Selected Task Display -->
+      <StackLayout class="form-card selected-task-display">
+        <GridLayout columns="*, auto">
+          <Label col="0" text="Reporting On" class="form-label"></Label>
+          <Button col="1" text="Change Task" (tap)="cancelReport()" class="btn-change-task"></Button>
+        </GridLayout>
+
+        <StackLayout class="selected-task-info">
+          <Label [text]="selectedTask?.title" class="selected-task-title"></Label>
+          <Label [text]="selectedTask?.location" class="selected-task-location"></Label>
+        </StackLayout>
+      </StackLayout>
+
+      <!-- Progress Status -->
+      <StackLayout class="form-card">
+        <Label text="Current Status" class="form-label required"></Label>
+        <GridLayout columns="*, *, *" class="status-grid">
+          <Button *ngFor="let status of progressStatuses; let i = index" [col]="i" [text]="status.display"
+            [class]="report.status === status.key ? 'btn-status active ' + status.class : 'btn-status ' + status.class"
+            (tap)="report.status = status.key"></Button>
+        </GridLayout>
+      </StackLayout>
+
+      <!-- Progress Percentage -->
+      <StackLayout class="form-card">
+        <GridLayout columns="*, auto">
+          <Label col="0" text="Completion Progress" class="form-label"></Label>
+          <Label col="1" [text]="report.progressPercentage + '%'" class="progress-percentage"></Label>
+        </GridLayout>
+        <Slider [(ngModel)]="report.progressPercentage" minValue="0" maxValue="100" class="progress-slider"></Slider>
+        <GridLayout columns="*, auto, *" class="slider-labels">
+          <Label col="0" text="0%" class="slider-label"></Label>
+          <Label col="1" text="50%" class="slider-label"></Label>
+          <Label col="2" text="100%" class="slider-label" textAlignment="right"></Label>
+        </GridLayout>
+      </StackLayout>
+
+      <!-- Work Completed -->
+      <StackLayout class="form-card">
+        <Label text="Work Completed Today" class="form-label required"></Label>
+        <TextView [(ngModel)]="report.workCompleted" hint="Describe what you accomplished today..."
+          class="form-textarea" height="80"></TextView>
+      </StackLayout>
+
+      <!-- Challenges/Issues -->
+      <StackLayout class="form-card">
+        <Label text="Challenges Encountered" class="form-label"></Label>
+        <TextView [(ngModel)]="report.challenges" hint="Any obstacles, delays, or issues faced (optional)"
+          class="form-textarea" height="60"></TextView>
+      </StackLayout>
+
+      <!-- Next Steps -->
+      <StackLayout class="form-card">
+        <Label text="Next Steps" class="form-label"></Label>
+        <TextView [(ngModel)]="report.nextSteps" hint="What you plan to work on next (optional)" class="form-textarea"
+          height="60"></TextView>
+      </StackLayout>
+
+      <!-- Time Tracking -->
+      <StackLayout class="form-card">
+        <Label text="Time Spent Today" class="form-label"></Label>
+        <GridLayout columns="auto, *, auto, *" class="time-grid">
+          <Label col="0" text="Hours:" class="time-label"></Label>
+          <TextField col="1" [(ngModel)]="report.hoursSpent" keyboardType="number" class="time-input" hint="0">
+          </TextField>
+          <Label col="2" text="Minutes:" class="time-label"></Label>
+          <TextField col="3" [(ngModel)]="report.minutesSpent" keyboardType="number" class="time-input" hint="0">
+          </TextField>
+        </GridLayout>
+      </StackLayout>
+
+      <!-- Photo Evidence -->
+      <StackLayout class="form-card">
+        <GridLayout columns="*, auto">
+          <Label col="0" text="Progress Photos" class="form-label"></Label>
+          <Button col="1" text="📷 Add" (tap)="addPhoto()" class="btn-photo"></Button>
+        </GridLayout>
+
+        <StackLayout *ngIf="report.photos && report.photos.length > 0" class="photos-grid">
+          <GridLayout *ngFor="let photo of report.photos; let i = index" columns="auto, *, auto" class="photo-item">
+            <Label col="0" text="🖼️" class="photo-icon"></Label>
+            <Label col="1" [text]="photo.name" class="photo-name"></Label>
+            <Button col="2" text="✕" (tap)="removePhoto(i)" class="btn-remove-photo"></Button>
+          </GridLayout>
+        </StackLayout>
+
+        <Label *ngIf="!report.photos || report.photos.length === 0" text="No photos added yet"
+          class="no-photos-message"></Label>
+      </StackLayout>
+
+      <!-- Additional Notes -->
+      <StackLayout class="form-card">
+        <Label text="Additional Notes" class="form-label"></Label>
+        <TextView [(ngModel)]="report.notes" hint="Any other information for your manager..." class="form-textarea"
+          height="60"></TextView>
+      </StackLayout>
+
+      <!-- Submit Section -->
+      <StackLayout class="submit-section">
+        <GridLayout columns="*, *" class="submit-actions">
+          <Button col="0" text="Cancel" (tap)="cancelReport()" class="btn-cancel-submit"></Button>
+          <Button col="1" text="Send Report" (tap)="onSubmit()" [isEnabled]="!isSubmitting && isFormValid()"
+            [class]="isFormValid() ? 'btn-submit' : 'btn-submit disabled'"></Button>
+        </GridLayout>
+
+        <ActivityIndicator [busy]="isSubmitting" class="loading-indicator"></ActivityIndicator>
+
+        <Label *ngIf="isSubmitting" text="Sending report to manager..." class="loading-text"></Label>
+      </StackLayout>
+
+    </StackLayout>
 
   </StackLayout>
 </ScrollView>

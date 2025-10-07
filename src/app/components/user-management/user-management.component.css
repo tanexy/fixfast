@@ -1,0 +1,90 @@
+.stat-card {
+  elevation: 2;
+  margin: 4;
+}
+
+.user-card {
+  elevation: 2;
+  margin: 8;
+  
+}
+
+.role-badge {
+  border-radius: 12;
+  font-size: 10;
+  min-width: 60;
+  padding: 4 8;
+}
+
+.action-btn {
+  elevation: 1;
+  margin: 2;
+}
+
+.action-btn:active {
+  elevation: 3;
+  opacity: 0.8;
+}
+
+.empty-state {
+  text-align: center;
+  margin-top: 40;
+}
+
+.filter-btn {
+  font-size: 14;
+  border-radius: 20;
+  padding: 8 16;
+  margin: 4;
+  elevation: 1;
+}
+
+.avatar-container {
+  width: 60;
+  height: 60;
+  border-radius: 30;
+}
+
+.text-primary {
+  color: #6366f1;
+}
+
+.text-success {
+  color: #10b981;
+}
+
+.text-danger {
+  color: #ef4444;
+}
+
+.text-warning {
+  color: #f59e0b;
+}
+
+.text-gray-600 {
+  color: #6b7280;
+}
+
+.text-gray-500 {
+  color: #9ca3af;
+}
+
+.text-gray-400 {
+  color: #d1d5db;
+}
+
+.bg-primary {
+  background-color: #6366f1;
+}
+
+.bg-success {
+  background-color: #10b981;
+}
+
+.bg-danger {
+  background-color: #ef4444;
+}
+
+.bg-warning {
+  background-color: #f59e0b;
+}

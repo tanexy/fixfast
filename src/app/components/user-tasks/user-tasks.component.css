@@ -1,0 +1,119 @@
+.stat-card-main {
+  elevation: 2;
+  margin: 4;
+}
+
+.task-card {
+  elevation: 2;
+  margin: 8;
+  border-left-width: 4;
+  border-left-color: #6366f1;
+}
+
+.status-summary-card {
+  elevation: 1;
+  margin: 4;
+}
+
+.priority-badge {
+  border-radius: 12;
+  font-size: 9;
+  min-width: 55;
+  padding: 4 8;
+}
+
+.task-action-btn {
+  elevation: 1;
+  margin: 2;
+}
+
+.task-action-btn:active {
+  elevation: 3;
+  opacity: 0.85;
+}
+
+.empty-state {
+  text-align: center;
+  margin-top: 40;
+}
+
+.filter-btn {
+  font-size: 14;
+  border-radius: 20;
+  padding: 8 16;
+  margin: 4;
+  elevation: 1;
+}
+
+.user-avatar {
+  width: 80;
+  height: 80;
+  border-radius: 40;
+}
+
+.user-header {
+  border: 1px solid #e2e8f0;
+}
+
+/* Colors */
+.text-primary {
+  color: #6366f1;
+}
+
+.text-success {
+  color: #10b981;
+}
+
+.text-danger {
+  color: #ef4444;
+}
+
+.text-warning {
+  color: #f59e0b;
+}
+
+.text-info {
+  color: #3b82f6;
+}
+
+.text-gray-600 {
+  color: #6b7280;
+}
+
+.text-gray-500 {
+  color: #9ca3af;
+}
+
+.text-gray-400 {
+  color: #d1d5db;
+}
+
+/* Backgrounds */
+.bg-primary {
+  background-color: #6366f1;
+}
+
+.bg-success {
+  background-color: #10b981;
+}
+
+.bg-danger {
+  background-color: #ef4444;
+}
+
+.bg-warning {
+  background-color: #f59e0b;
+}
+
+.bg-info {
+  background-color: #3b82f6;
+}
+
+.bg-light {
+  background-color: #f8fafc;
+}
+
+/* Progress Bar Styling */
+ProgressBar {
+  border-radius: 4;
+}

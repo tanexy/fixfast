@@ -1,0 +1,227 @@
+<ActionBar title="Equipment Inventory" backgroundColor="#1E293B" color="white"></ActionBar>
+
+<ScrollView backgroundColor="#F8FAFC">
+    <StackLayout class="p-4">
+
+        <!-- Header Section -->
+        <StackLayout class="inventory-header">
+            <Label text="Inventory Management" class="header-title"></Label>
+            <Label text="Log equipment counts and status" class="header-subtitle"></Label>
+            <Label [text]="'Date: ' + (inventoryLog.dateLogged | date:'MMM d, yyyy')" class="date-badge"></Label>
+        </StackLayout>
+
+        <!-- Saved Inventory Section -->
+        <StackLayout class="saved-inventory-section">
+            <StackLayout *ngIf="savedInventory.length === 0" class="form-card">
+                <Label text="No saved inventory found" class="empty-message"></Label>
+            </StackLayout>
+
+            <StackLayout *ngFor="let categoryGroup of savedInventory" class="category-card">
+                <!-- Category Header -->
+                <GridLayout columns="auto, *, auto" class="category-header">
+                    <Label col="0" [text]="getCategoryIcon(categoryGroup.category)" class="category-icon"></Label>
+                    <Label col="1" [text]="categoryGroup.category" class="category-title"></Label>
+                    <Label col="2" [text]="categoryGroup.total_count + ' items'" class="category-count"></Label>
+                </GridLayout>
+
+                <!-- Category Summary Stats -->
+                <GridLayout columns="*, *, *, *" class="category-stats">
+                    <StackLayout col="0" class="category-stat">
+                        <Label text="Total" class="stat-label"></Label>
+                        <Label [text]="categoryGroup.total_count" class="stat-value-large"></Label>
+                    </StackLayout>
+                    <StackLayout col="1" class="category-stat">
+                        <Label text="Working" class="stat-label"></Label>
+                        <Label [text]="categoryGroup.functioning" class="stat-value-large functioning"></Label>
+                    </StackLayout>
+                    <StackLayout col="2" class="category-stat">
+                        <Label text="Repair" class="stat-label"></Label>
+                        <Label [text]="categoryGroup.in_repair" class="stat-value-large repair"></Label>
+                    </StackLayout>
+                    <StackLayout col="3" class="category-stat">
+                        <Label text="New" class="stat-label"></Label>
+                        <Label [text]="categoryGroup.newly_bought" class="stat-value-large new"></Label>
+                    </StackLayout>
+                </GridLayout>
+
+                <!-- Items in Category -->
+                <StackLayout class="category-items">
+                    <StackLayout *ngFor="let item of categoryGroup" class="saved-item">
+                        <GridLayout columns="*, auto">
+                            <StackLayout col="0">
+                                <Label [text]="item.equipment_type" class="saved-item-name"></Label>
+                                <GridLayout columns="auto, auto, auto, auto" class="saved-item-stats">
+                                    <StackLayout col="0" class="saved-stat">
+                                        <Label text="Total: " class="saved-stat-label"></Label>
+                                        <Label [text]="item.total_count" class="saved-stat-value"></Label>
+                                    </StackLayout>
+                                    <StackLayout col="1" class="saved-stat">
+                                        <Label text="• Working: " class="saved-stat-label functioning"></Label>
+                                        <Label [text]="item.functioning" class="saved-stat-value functioning"></Label>
+                                    </StackLayout>
+                                    <StackLayout col="2" class="saved-stat">
+                                        <Label text="• Repair: " class="saved-stat-label repair"></Label>
+                                        <Label [text]="item.in_repair" class="saved-stat-value repair"></Label>
+                                    </StackLayout>
+                                    <StackLayout col="3" class="saved-stat">
+                                        <Label text="• New: " class="saved-stat-label new"></Label>
+                                        <Label [text]="item.newly_bought" class="saved-stat-value new"></Label>
+                                    </StackLayout>
+                                </GridLayout>
+                            </StackLayout>
+                        </GridLayout>
+                    </StackLayout>
+                </StackLayout>
+            </StackLayout>
+        </StackLayout>
+
+        <!-- Add New Equipment Section -->
+        <StackLayout class="form-card">
+            <Label text="Add Equipment" class="form-label"></Label>
+
+            <!-- Show available equipment list when not in add/edit mode -->
+            <StackLayout *ngIf="!showAddForm">
+                <Label *ngIf="getAvailableEquipment().length === 0" text="All equipment types have been added"
+                    class="empty-message"></Label>
+
+                <StackLayout *ngIf="getAvailableEquipment().length > 0" class="equipment-selector">
+                    <Button *ngFor="let eq of getAvailableEquipment()" [text]="eq.name + ' (' + eq.category + ')'"
+                        (tap)="selectEquipmentToAdd(eq)" class="equipment-select-btn"></Button>
+                </StackLayout>
+            </StackLayout>
+
+            <!-- Equipment Entry Form (shown when equipment selected) -->
+            <StackLayout *ngIf="showAddForm" class="equipment-form">
+                <StackLayout class="equipment-header">
+                    <Label [text]="currentEquipment.name" class="equipment-name"></Label>
+                    <Label [text]="currentEquipment.category" class="equipment-category"></Label>
+                </StackLayout>
+
+                <!-- Custom Name Input for Others Category -->
+                <StackLayout *ngIf="showCustomNameInput" class="input-row">
+                    <Label text="Item Name" class="form-label required"></Label>
+                    <TextField [(ngModel)]="customItemName" 
+                        hint="Enter item name..." 
+                        class="custom-name-input"></TextField>
+                </StackLayout>
+
+                <!-- Total Count -->
+                <GridLayout columns="*, auto" class="input-row">
+                    <Label col="0" text="Total Equipment" class="input-label"></Label>
+                    <TextField col="1" [(ngModel)]="currentEquipment.total" keyboardType="number" class="count-input"
+                        hint="0"></TextField>
+                </GridLayout>
+
+                <!-- Functioning -->
+                <GridLayout columns="*, auto" class="input-row">
+                    <StackLayout col="0" orientation="horizontal">
+                        <Label text="● " class="status-dot functioning"></Label>
+                        <Label text="Functioning" class="input-label"></Label>
+                    </StackLayout>
+                    <TextField col="1" [(ngModel)]="currentEquipment.functioning" keyboardType="number"
+                        class="count-input" hint="0"></TextField>
+                </GridLayout>
+
+                <!-- In Repair -->
+                <GridLayout columns="*, auto" class="input-row">
+                    <StackLayout col="0" orientation="horizontal">
+                        <Label text="● " class="status-dot repair"></Label>
+                        <Label text="In Repair" class="input-label"></Label>
+                    </StackLayout>
+                    <TextField col="1" [(ngModel)]="currentEquipment.inRepair" keyboardType="number" class="count-input"
+                        hint="0"></TextField>
+                </GridLayout>
+
+                <!-- Replaced -->
+                <GridLayout columns="*, auto" class="input-row">
+                    <StackLayout col="0" orientation="horizontal">
+                        <Label text="● " class="status-dot replaced"></Label>
+                        <Label text="Replaced" class="input-label"></Label>
+                    </StackLayout>
+                    <TextField col="1" [(ngModel)]="currentEquipment.replaced" keyboardType="number" class="count-input"
+                        hint="0"></TextField>
+                </GridLayout>
+
+                <!-- Newly Bought -->
+                <GridLayout columns="*, auto" class="input-row">
+                    <StackLayout col="0" orientation="horizontal">
+                        <Label text="● " class="status-dot new"></Label>
+                        <Label text="Newly Bought" class="input-label"></Label>
+                    </StackLayout>
+                    <TextField col="1" [(ngModel)]="currentEquipment.newlyBought" keyboardType="number"
+                        class="count-input" hint="0"></TextField>
+                </GridLayout>
+
+                <!-- Action Buttons -->
+                <GridLayout columns="*, *" class="form-actions">
+                    <Button col="0" text="Cancel" (tap)="cancelAddForm()" class="btn-cancel"></Button>
+                    <Button col="1" [text]="isEditMode ? 'Update' : 'Add'" (tap)="addOrUpdateEquipment()"
+                        class="btn-add-equipment"></Button>
+                </GridLayout>
+            </StackLayout>
+        </StackLayout>
+
+        <!-- Current Inventory List -->
+        <StackLayout *ngIf="inventoryLog.equipment.length > 0" class="form-card">
+            <GridLayout columns="*, auto" class="list-header">
+                <Label col="0" text="Current Inventory" class="form-label"></Label>
+                <Label col="1" [text]="getEquipmentSummary()" class="summary-badge"></Label>
+            </GridLayout>
+
+            <StackLayout class="equipment-list">
+                <GridLayout *ngFor="let item of inventoryLog.equipment; let i = index" columns="*, auto, auto"
+                    class="equipment-item">
+
+                    <StackLayout col="0" (tap)="editEquipment(i)">
+                        <Label [text]="item.name" class="item-name"></Label>
+                        <Label [text]="item.category" class="item-category"></Label>
+
+                        <GridLayout columns="auto, auto, auto, auto" class="item-stats">
+                            <StackLayout col="0" class="stat-item">
+                                <Label text="Total" class="stat-label"></Label>
+                                <Label [text]="item.total" class="stat-value"></Label>
+                            </StackLayout>
+
+                            <StackLayout col="1" class="stat-item">
+                                <Label text="Working" class="stat-label"></Label>
+                                <Label [text]="item.functioning" class="stat-value functioning"></Label>
+                            </StackLayout>
+
+                            <StackLayout col="2" class="stat-item">
+                                <Label text="Repair" class="stat-label"></Label>
+                                <Label [text]="item.inRepair" class="stat-value repair"></Label>
+                            </StackLayout>
+
+                            <StackLayout col="3" class="stat-item">
+                                <Label text="New" class="stat-label"></Label>
+                                <Label [text]="item.newlyBought" class="stat-value new"></Label>
+                            </StackLayout>
+                        </GridLayout>
+                    </StackLayout>
+
+                    <Button col="1" text="✏️" (tap)="editEquipment(i)" class="btn-edit"></Button>
+                    <Button col="2" text="✕" (tap)="removeEquipment(i)" class="btn-remove"></Button>
+                </GridLayout>
+            </StackLayout>
+        </StackLayout>
+
+        <!-- Additional Notes -->
+        <StackLayout class="form-card">
+            <Label text="Additional Notes" class="form-label"></Label>
+            <TextView [(ngModel)]="inventoryLog.notes"
+                hint="Any observations, issues, or comments about the inventory..." class="form-textarea" height="80">
+            </TextView>
+        </StackLayout>
+
+        <!-- Submit Section -->
+        <StackLayout class="submit-section">
+            <Button text="Submit Inventory Log" (tap)="onSubmit()" [isEnabled]="!isSubmitting && isFormValid()"
+                [class]="isFormValid() ? 'btn-submit' : 'btn-submit disabled'"></Button>
+
+            <ActivityIndicator [busy]="isSubmitting" class="loading-indicator"></ActivityIndicator>
+
+            <Label *ngIf="isSubmitting" text="Submitting inventory log..." class="loading-text"></Label>
+        </StackLayout>
+
+    </StackLayout>
+</ScrollView>

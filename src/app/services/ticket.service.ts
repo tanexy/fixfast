@@ -1,130 +1,612 @@
-import { Injectable } from '@angular/core'
-import { Observable, BehaviorSubject } from 'rxjs'
-
-export interface Ticket {
-  id: string
-  title: string
-  description: string
-  status: 'open' | 'in-progress' | 'resolved' | 'closed'
-  priority: 'low' | 'medium' | 'high' | 'critical'
-  location: string
-  assignedTo?: string
-  reportedBy: string
-  createdAt: Date
-  updatedAt: Date
-  attachments?: string[]
-}
+import { Injectable } from "@angular/core";
+import { Observable, BehaviorSubject } from "rxjs";
+import { Http } from "@nativescript/core";
+import { AuthService } from "./auth.service";
+import { InventoryLog, Ticket, CreateTicketRequest, User } from "../enums/enums";
+import { NotificationsService } from "./notifications.service";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class TicketService {
-  private tickets: Ticket[] = []
-  private ticketsSubject = new BehaviorSubject<Ticket[]>([])
+  private readonly API_BASE_URL = "https://c76cc83d4b5a.ngrok-free.app";
 
-  constructor() {
-    this.initializeSampleData()
+  private ticketsSubject = new BehaviorSubject<Ticket[]>([]);
+  private tasksSubject = new BehaviorSubject<Task[]>([]);
+
+  constructor(private authService: AuthService,private notificationsService: NotificationsService) {
+    this.loadTickets();
   }
 
+  /**
+   * Get all tickets as Observable
+   */
   getTickets(): Observable<Ticket[]> {
-    return this.ticketsSubject.asObservable()
+    return this.ticketsSubject.asObservable();
   }
 
-  getTicketsByUser(userEmail: string): Observable<Ticket[]> {
-    const userTickets = this.tickets.filter(ticket => ticket.reportedBy === userEmail)
-    return new BehaviorSubject(userTickets).asObservable()
+  /**
+   * Get all tasks as Observable
+   */
+  getTasks(): Observable<Task[]> {
+    return this.tasksSubject.asObservable();
   }
 
+  /**
+   * Load all tickets from backend
+   */
+  async loadTickets(): Promise<void> {
+    try {
+      const token = this.authService.getToken();
+
+      if (!token) {
+        throw new Error("Not authenticated");
+      }
+
+      const response = await Http.request({
+        url: `${this.API_BASE_URL}/services/alltickets`,
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.statusCode !== 200) {
+        if (!response.content) {
+          throw new Error("No response from server");
+        }
+        const errorData = response.content.toJSON();
+        throw new Error(errorData.message || "Failed to fetch tickets");
+      }
+
+      if (!response.content) {
+        throw new Error("No response from server");
+      }
+
+      const data = response.content.toJSON();
+      const tickets = this.mapBackendTickets(data);
+      this.ticketsSubject.next(tickets);
+    } catch (error: any) {
+      console.error("Load tickets error:", error);
+      throw new Error(error.message || "Failed to load tickets");
+    }
+  }
+
+  /**
+   * Get tickets for a specific user by ID (returns Observable)
+   */
+  getTicketsByUser(userId: string): Observable<Ticket[]> {
+    const userTicketsSubject = new BehaviorSubject<Ticket[]>([]);
+
+    this.loadTicketsByUser(userId)
+      .then((tickets) => {
+        userTicketsSubject.next(tickets);
+      })
+      .catch((error) => {
+        console.error("Get user tickets error:", error);
+        userTicketsSubject.next([]);
+      });
+
+    return userTicketsSubject.asObservable();
+  }
+
+  /**
+   * Load tickets for a specific user by ID
+   */
+  async loadTicketsByUser(userId: string): Promise<Ticket[]> {
+    try {
+      const token = this.authService.getToken();
+
+      if (!token) {
+        throw new Error("Not authenticated");
+      }
+
+      const response = await Http.request({
+        url: `${this.API_BASE_URL}/services/get-tickets/${userId}`,
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.statusCode !== 200) {
+        if (!response.content) {
+          throw new Error("No response from server");
+        }
+        const errorData = response.content.toJSON();
+        throw new Error(errorData.message || "Failed to fetch user tickets");
+      }
+
+      if (!response.content) {
+        throw new Error("No response from server");
+      }
+
+      const data = response.content.toJSON();
+      return this.mapBackendTickets(data);
+    } catch (error: any) {
+      console.error("Load user tickets error:", error);
+      throw new Error(error.message || "Failed to fetch user tickets");
+    }
+  }
+
+  /**
+   * Get ticket by ID from local cache
+   */
   getTicketById(id: string): Ticket | undefined {
-    return this.tickets.find(ticket => ticket.id === id)
+    return this.ticketsSubject.value.find((ticket) => ticket.id === id);
   }
 
-  async createTicket(reportData: any): Promise<Ticket> {
-    const newTicket: Ticket = {
-      id: 'ticket_' + Date.now(),
-      title: reportData.title,
-      description: reportData.description,
-      status: 'open',
-      priority: reportData.severity,
-      location: reportData.location,
-      reportedBy: reportData.reporterContact || 'Anonymous',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      attachments: reportData.attachments || []
+  /**
+   * Create a new ticket
+   */
+  async createTicket(reportData: CreateTicketRequest): Promise<Ticket> {
+    try {
+      const token = this.authService.getToken();
+
+      if (!token) {
+        throw new Error("Not authenticated");
+      }
+
+      const response = await Http.request({
+        url: `${this.API_BASE_URL}/services/create-ticket`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        content: JSON.stringify({
+          title: reportData.title,
+          description: reportData.description,
+          severity: reportData.severity,
+          location: reportData.location,
+          reporterContact: reportData.reporterContact,
+          attachments: reportData.attachments || [],
+        }),
+      });
+
+      if (response.statusCode !== 201 && response.statusCode !== 200) {
+        if (!response.content) {
+          throw new Error("No response from server");
+        }
+        const errorData = response.content.toJSON();
+        throw new Error(errorData.message || "Failed to create ticket");
+      }
+
+      if (!response.content) {
+        throw new Error("No response from server");
+      }
+
+      const data = response.content.toJSON();
+      const newTicket = this.mapBackendTicket(data);
+
+      // Update local cache
+      const currentTickets = this.ticketsSubject.value;
+      this.ticketsSubject.next([newTicket, ...currentTickets]);
+
+      return newTicket;
+    } catch (error: any) {
+      console.error("Create ticket error:", error);
+      throw new Error(error.message || "Failed to create ticket");
     }
-
-    this.tickets.unshift(newTicket)
-    this.ticketsSubject.next([...this.tickets])
-
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1000))
-
-    return newTicket
   }
 
-  async updateTicketStatus(ticketId: string, status: Ticket['status']): Promise<void> {
-    const ticket = this.getTicketById(ticketId)
-    if (ticket) {
-      ticket.status = status
-      ticket.updatedAt = new Date()
-      this.ticketsSubject.next([...this.tickets])
+  /**
+   * Get all faults from backend
+   */
+  async getFaults(): Promise<any[]> {
+    try {
+      const token = this.authService.getToken();
+
+      if (!token) {
+        throw new Error("Not authenticated");
+      }
+
+      const response = await Http.request({
+        url: `${this.API_BASE_URL}/services/faults`,
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.statusCode !== 200) {
+        if (!response.content) {
+          throw new Error("No response from server");
+        }
+        const errorData = response.content.toJSON();
+        throw new Error(errorData.message || "Failed to fetch faults");
+      }
+
+      if (!response.content) {
+        throw new Error("No response from server");
+      }
+
+      return response.content.toJSON();
+    } catch (error: any) {
+      console.error("Get faults error:", error);
+      throw new Error(error.message || "Failed to fetch faults");
     }
-
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500))
   }
+
+  /**
+   * Load all tasks
+   */
+  async loadTasks(): Promise<void> {
+    try {
+      const token = this.authService.getToken();
+
+      if (!token) {
+        throw new Error("Not authenticated");
+      }
+
+      const response = await Http.request({
+        url: `${this.API_BASE_URL}/services/tasks`,
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.statusCode !== 200) {
+        if (!response.content) {
+          throw new Error("No response from server");
+        }
+        const errorData = response.content.toJSON();
+        throw new Error(errorData.message || "Failed to fetch tasks");
+      }
+
+      if (!response.content) {
+        throw new Error("No response from server");
+      }
+
+      const data = response.content.toJSON();
+      this.tasksSubject.next(data);
+    } catch (error: any) {
+      console.error("Load tasks error:", error);
+      throw new Error(error.message || "Failed to load tasks");
+    }
+  }
+
+  /**
+   * Get task by ID
+   */
+  async getTaskById(id: string): Promise<Task> {
+    try {
+      const token = this.authService.getToken();
+
+      if (!token) {
+        throw new Error("Not authenticated");
+      }
+
+      const response = await Http.request({
+        url: `${this.API_BASE_URL}/services/tasks/${id}`,
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.statusCode !== 200) {
+        if (!response.content) {
+          throw new Error("No response from server");
+        }
+        const errorData = response.content.toJSON();
+        throw new Error(errorData.message || "Failed to fetch task");
+      }
+
+      if (!response.content) {
+        throw new Error("No response from server");
+      }
+
+      return response.content.toJSON();
+    } catch (error: any) {
+      console.error("Get task error:", error);
+      throw new Error(error.message || "Failed to fetch task");
+    }
+  }
+
+  //Update ticket status
+
+  async updateTicketStatus(
+    ticketId: string,
+    status: Ticket["status"]
+  ): Promise<void> {
+    try {
+      const token = this.authService.getToken();
+
+      if (!token) {
+        throw new Error("Not authenticated");
+      }
+
+      const response = await Http.request({
+        url: `${this.API_BASE_URL}/services/tickets/${ticketId}/status`,
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        content: JSON.stringify({ status }),
+      });
+
+      if (response.statusCode !== 200) {
+        if (!response.content) {
+          throw new Error("No response from server");
+        }
+        const errorData = response.content.toJSON();
+        throw new Error(errorData.message || "Failed to update ticket status");
+      }
+
+      // Update local cache
+      const tickets = this.ticketsSubject.value;
+      const ticketIndex = tickets.findIndex((t) => t.id === ticketId);
+      if (ticketIndex !== -1) {
+        tickets[ticketIndex].status = status;
+        tickets[ticketIndex].updatedAt = new Date();
+        this.ticketsSubject.next([...tickets]);
+      }
+    } catch (error: any) {
+      console.error("Update ticket status error:", error);
+      throw new Error(error.message || "Failed to update ticket status");
+    }
+  }
+
+  // Assign ticket to user
 
   async assignTicket(ticketId: string, assignee: string): Promise<void> {
-    const ticket = this.getTicketById(ticketId)
-    if (ticket) {
-      ticket.assignedTo = assignee
-      ticket.updatedAt = new Date()
-      this.ticketsSubject.next([...this.tickets])
-    }
+    try {
+      const token = this.authService.getToken();
 
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500))
+      if (!token) {
+        throw new Error("Not authenticated");
+      }
+
+      const response = await Http.request({
+        url: `${this.API_BASE_URL}/services/tickets/${ticketId}/assign`,
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        content: JSON.stringify({ assignee }),
+      });
+
+      if (response.statusCode !== 200) {
+        if (!response.content) {
+          throw new Error("No response from server");
+        }
+        const errorData = response.content.toJSON();
+        throw new Error(errorData.message || "Failed to assign ticket");
+      }
+
+      // Update local cache
+      const tickets = this.ticketsSubject.value;
+      const ticketIndex = tickets.findIndex((t) => t.id === ticketId);
+      if (ticketIndex !== -1) {
+        tickets[ticketIndex].assignedTo = assignee;
+        tickets[ticketIndex].updatedAt = new Date();
+        this.ticketsSubject.next([...tickets]);
+      }
+    } catch (error: any) {
+      console.error("Assign ticket error:", error);
+      throw new Error(error.message || "Failed to assign ticket");
+    }
   }
 
-  private initializeSampleData(): void {
-    this.tickets = [
-      {
-        id: 'ticket_001',
-        title: 'Air Conditioning Not Working',
-        description: 'The AC unit in conference room B is not cooling properly. Temperature is consistently above 80°F.',
-        status: 'in-progress',
-        priority: 'high',
-        location: 'Conference Room B - Floor 3',
-        assignedTo: 'Mike Johnson',
-        reportedBy: 'sarah.connor@company.com',
-        createdAt: new Date(Date.now() - 86400000), // 1 day ago
-        updatedAt: new Date(Date.now() - 3600000)   // 1 hour ago
-      },
-      {
-        id: 'ticket_002',
-        title: 'Flickering Light in Hallway',
-        description: 'Fluorescent light in the main hallway keeps flickering intermittently.',
-        status: 'open',
-        priority: 'medium',
-        location: 'Main Hallway - Floor 2',
-        reportedBy: 'john.smith@company.com',
-        createdAt: new Date(Date.now() - 43200000), // 12 hours ago
-        updatedAt: new Date(Date.now() - 43200000)
-      },
-      {
-        id: 'ticket_003',
-        title: 'Water Cooler Empty',
-        description: 'The water cooler near the break room has been empty for two days.',
-        status: 'resolved',
-        priority: 'low',
-        location: 'Break Room - Floor 1',
-        assignedTo: 'Lisa Chen',
-        reportedBy: 'emma.davis@company.com',
-        createdAt: new Date(Date.now() - 172800000), // 2 days ago
-        updatedAt: new Date(Date.now() - 7200000)    // 2 hours ago
-      }
-    ]
+  /**
+   * Map backend ticket data to frontend Ticket interface
+   */
+  private mapBackendTicket(data: any): Ticket {
+    return {
+      id: data.id || data.ID,
+      title: data.title,
+      description: data.description,
+      status: data.status || "open",
+      priority: data.priority || data.severity || "medium",
+      location: data.location,
+      assignedTo: data.assignedTo || data.assigned_to,
+      reportedBy:
+        data.reportedBy ||
+        data.reported_by ||
+        data.reporterContact ||
+        "Anonymous",
+      createdAt: new Date(data.createdAt || data.created_at),
+      updatedAt: new Date(data.updatedAt || data.updated_at),
+      attachments: data.attachments || [],
+    };
+  }
 
-    this.ticketsSubject.next([...this.tickets])
+  /**
+   * Map array of backend tickets
+   */
+  private mapBackendTickets(data: any): Ticket[] {
+    if (Array.isArray(data)) {
+      return data.map((ticket) => this.mapBackendTicket(ticket));
+    } else if (data.tickets && Array.isArray(data.tickets)) {
+      return data.tickets.map((ticket: any) => this.mapBackendTicket(ticket));
+    }
+    return [];
+  }
+
+  async submitInventory(inventoryLog: InventoryLog): Promise<any> {
+    const token = this.authService.getToken();
+    inventoryLog.equipment = inventoryLog.equipment.map((eq) => ({
+      ...eq,
+      total: Number(eq.total),
+      functioning: Number(eq.functioning),
+      inRepair: Number(eq.inRepair),
+      replaced: Number(eq.replaced),
+      newlyBought: Number(eq.newlyBought),
+    }));
+
+    const response = await Http.request({
+      url: `${this.API_BASE_URL}/services/create-inventory-log`,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      content: JSON.stringify(inventoryLog),
+    });
+
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      return JSON.parse(response.content.toString());
+    } else {
+      throw new Error(`Failed to submit inventory: ${response.statusCode}`);
+    }
+  }
+  async getInventoryLog(): Promise<any> {
+    try {
+      const token = this.authService.getToken();
+
+      const response = await Http.request({
+        url: `${this.API_BASE_URL}/services/inventory-logs`,
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.statusCode !== 200) {
+        console.error("API error:", response.content.toString());
+        throw new Error(
+          `Failed to fetch inventory log: ${response.statusCode}`
+        );
+      }
+
+      // Safely parse JSON
+      let result: InventoryLog | null = null;
+      try {
+        result = response.content.toJSON() as InventoryLog;
+        
+      } catch (err) {
+        console.error(
+          "Failed to parse JSON:",
+          err,
+          response.content.toString()
+        );
+      }
+
+      return result;
+    } catch (err) {
+      console.error("getInventoryLog error:", err);
+      return null; // safely return null if something goes wrong
+    }
+  }
+  async getUsers(): Promise<any[]> {
+    try {
+      const token = this.authService.getToken();
+
+      const response = await Http.request({
+        url: `${this.API_BASE_URL}/services/users`,
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.statusCode !== 200) {
+        console.error("API error:", response.content.toString());
+        throw new Error(`Failed to fetch users: ${response.statusCode}`);
+      }
+
+      // Safely parse JSON
+      let result: any[] | null = null;
+      try {
+        result = response.content.toJSON() as any[];
+        console.log("result", result);
+      } catch (err) {
+        console.error(
+          "Failed to parse JSON:",
+          err,
+          response.content.toString()
+        );
+      }
+
+      return result;
+    } catch (err) {
+      console.error("getInventoryLog error:", err);
+      return null; // safely return null if something goes wrong
+    }
+  }
+  async deleteUser(userId: number): Promise<void> {
+    try {
+      const token = this.authService.getToken();
+
+      const response = await Http.request({
+        url: `${this.API_BASE_URL}/services/delete-user/${userId}`,
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (response.statusCode == 200) {
+       this.notificationsService.showSuccess("User deleted successfully");
+      }
+      else{
+        this.notificationsService.showError("Failed to delete user");
+
+      }
+    } catch (err) {
+      console.error("deleteUser error:", err);
+      throw new Error("Failed to delete user");
+    }
+  }
+  async changeRole(userId: number): Promise<void> {
+    try {
+      const token = this.authService.getToken();
+
+      const response = await Http.request({
+        url: `${this.API_BASE_URL}/services/change-role/${userId}`,
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        
+      });
+      if (response.statusCode == 200) {
+       this.notificationsService.showSuccess("User role updated successfully");
+      }
+      else{
+        this.notificationsService.showError("Failed to update user role");
+
+      }
+    } catch (err) {
+      console.error("changeRole error:", err);
+      throw new Error("Failed to change user role");
+    }
+  }
+  async revokeAdminRights(userId: number): Promise<void> {
+    try {
+      const token = this.authService.getToken();
+
+      const response = await Http.request({
+        url: `${this.API_BASE_URL}/services/revoke-admin-rights/${userId}`,
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        
+      });
+      if (response.statusCode == 200) {
+       this.notificationsService.showSuccess("Admin rights revoked successfully");
+      }
+      else{
+        this.notificationsService.showError("Failed to revoke admin rights");
+
+      }
+    } catch (err) {
+      console.error("revokeAdminRights error:", err);
+      throw new Error("Failed to revoke admin rights");
+    }
   }
 }

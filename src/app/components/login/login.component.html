@@ -1,0 +1,67 @@
+<!-- Modern Login Component Template -->
+<ActionBar visibility="hidden"></ActionBar>
+<ScrollView>
+    <StackLayout class="login-container">
+
+        
+        <StackLayout class="header-section" horizontalAlignment="center" verticalAlignment="center">
+            <Image src="~/assets/icons/ticket.png" width="32" height="32" stretch="aspectFit" class="app-logo"></Image>
+            <Label text="Fix Fast.Track Smart.Resolve Right" class="app-title"></Label>
+            <Label text="Sign in to continue" class="welcome-text"></Label>
+        </StackLayout>
+
+        <!-- Main Login Card -->
+        <StackLayout class="login-card">
+
+            <!-- Input Fields Container -->
+            <StackLayout class="inputs-container">
+
+                <!-- Email Input -->
+                <StackLayout class="input-wrapper">
+                    <Label text="Username" class="input-label"></Label>
+                    <TextField [(ngModel)]="username" hint="Enter your username"  autocorrect="false"
+                        autocapitalizationType="none" class="modern-input" returnKeyType="next">
+                    </TextField>
+                </StackLayout>
+
+                <!-- Password Input -->
+                <StackLayout class="input-wrapper">
+                    <Label text="Password" class="input-label"></Label>
+                    <TextField [(ngModel)]="password" hint="Enter your password" secure="true" class="modern-input"
+                        returnKeyType="done">
+                    </TextField>
+                </StackLayout>
+
+            </StackLayout>
+
+            <!-- Options Row -->
+            <GridLayout columns="*, auto" class="options-row">
+                <StackLayout col="0" orientation="horizontal" class="remember-section">
+                    <Switch [(ngModel)]="rememberMe" class="modern-switch"></Switch>
+                    <Label text="Remember me" class="remember-label"></Label>
+                </StackLayout>
+                <Label col="1" text="Forgot password?" (tap)="onForgotPassword()" class="forgot-link"></Label>
+            </GridLayout>
+
+            <!-- Login Button -->
+            <Button text="Sign In" (tap)="onLogin()" [isEnabled]="isFormValid() && !isLoading" class="signin-button">
+            </Button>
+
+            <!-- Loading State -->
+            <StackLayout *ngIf="isLoading" class="loading-container">
+                <ActivityIndicator [busy]="isLoading" class="loading-spinner"></ActivityIndicator>
+                <Label text="Signing you in..." class="loading-label"></Label>
+            </StackLayout>
+
+        </StackLayout>
+
+        <!-- Bottom Section -->
+        <StackLayout class="bottom-section">
+            <StackLayout orientation="horizontal" class="signup-row" horizontalAlignment="center">
+                <Label text="Don't have an account? " class="signup-question"></Label>
+                <Label text="Sign Up" (tap)="onSignUp()" class="signup-link"></Label>
+            </StackLayout>
+        </StackLayout>
+
+    </StackLayout>
+</ScrollView>

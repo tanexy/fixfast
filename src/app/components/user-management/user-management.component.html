@@ -1,0 +1,331 @@
+<ActionBar title="User Management" backgroundColor="#1E293B" color="white">
+    <ActionItem text="Add User" color="white" (tap)="addNewUser()" ios.position="right" android.position="actionBar"></ActionItem>
+</ActionBar>
+
+<ScrollView>
+    <StackLayout class="p-4 bg-gradient">
+
+        <!-- Statistics Cards -->
+        <GridLayout columns="*, *, *" class="mb-4">
+            <StackLayout col="0" class="stat-card p-3 mr-2" backgroundColor="white" borderRadius="16" elevation="2">
+                <Label text="👥" class="stat-icon mb-2"></Label>
+                <Label [text]="stats.totalUsers" class="stat-number mb-1"></Label>
+                <Label text="Total Users" class="stat-label"></Label>
+            </StackLayout>
+
+            <StackLayout col="1" class="stat-card p-3 mx-1" backgroundColor="white" borderRadius="16" elevation="2">
+                <Label text="✅" class="stat-icon mb-2"></Label>
+                <Label [text]="stats.activeUsers" class="stat-number mb-1"></Label>
+                <Label text="Active" class="stat-label"></Label>
+            </StackLayout>
+
+            <StackLayout col="2" class="stat-card p-3 ml-2" backgroundColor="white" borderRadius="16" elevation="2">
+                <Label text="⭐" class="stat-icon mb-2"></Label>
+                <Label [text]="stats.admins" class="stat-number mb-1"></Label>
+                <Label text="Admins" class="stat-label"></Label>
+            </StackLayout>
+        </GridLayout>
+
+        <!-- Filter Buttons -->
+        <ScrollView orientation="horizontal" class="mb-4">
+            <StackLayout orientation="horizontal">
+                <Button text="All Users" (tap)="filterUsers('all')"
+                    [backgroundColor]="selectedFilter === 'all' ? '#6366f1' : 'white'"
+                    [color]="selectedFilter === 'all' ? 'white' : '#6366f1'" class="filter-btn mr-2" borderRadius="20"
+                    elevation="1"></Button>
+
+                <Button text="Active" (tap)="filterUsers('active')"
+                    [backgroundColor]="selectedFilter === 'active' ? '#10b981' : 'white'"
+                    [color]="selectedFilter === 'active' ? 'white' : '#10b981'" class="filter-btn mr-2"
+                    borderRadius="20" elevation="1"></Button>
+
+                <Button text="Admins" (tap)="filterUsers('admin')"
+                    [backgroundColor]="selectedFilter === 'admin' ? '#8b5cf6' : 'white'"
+                    [color]="selectedFilter === 'admin' ? 'white' : '#8b5cf6'" class="filter-btn mr-2" borderRadius="20"
+                    elevation="1"></Button>
+
+                <Button text="Technicians" (tap)="filterUsers('technician')"
+                    [backgroundColor]="selectedFilter === 'technician' ? '#3b82f6' : 'white'"
+                    [color]="selectedFilter === 'technician' ? 'white' : '#3b82f6'" class="filter-btn mr-2"
+                    borderRadius="20" elevation="1"></Button>
+            </StackLayout>
+        </ScrollView>
+
+        <!-- Section Header -->
+        <StackLayout class="section-header mb-4">
+            <Label [text]="'👤 Team Members (' + filteredUsers.length + ')'" class="section-title"></Label>
+            <Label text="Manage user accounts and permissions" class="section-subtitle"></Label>
+        </StackLayout>
+
+        <!-- Empty State -->
+        <StackLayout *ngIf="filteredUsers.length === 0" class="empty-state p-6" backgroundColor="white"
+            borderRadius="16" elevation="1">
+            <Label text="🔍" class="empty-icon mb-3"></Label>
+            <Label text="No Users Found" class="empty-title mb-2"></Label>
+            <Label text="Try adjusting your filters or search criteria" class="empty-subtitle"></Label>
+        </StackLayout>
+
+        <!-- User Cards -->
+        <StackLayout *ngFor="let user of filteredUsers" class="user-card mb-4 p-4" backgroundColor="white"
+            borderRadius="16" elevation="2">
+
+            <!-- User Header -->
+            <GridLayout columns="auto, *, auto" rows="auto, auto" class="mb-3">
+                <!-- Avatar -->
+                <StackLayout col="0" row="0" rowSpan="2" class="avatar-container mr-3"
+                    [backgroundColor]="getRoleColor(user.Role)" borderRadius="30" width="60" height="60">
+                    <Label [text]="getAvatarInitials(user.Username)" class="avatar-text"></Label>
+                </StackLayout>
+
+                <!-- User Info -->
+                <StackLayout col="1" row="0">
+                    <Label [text]="user.UserName" class="user-name mb-1"></Label>
+                    <Label [text]="user.Email" class="user-email mb-1"></Label>
+                    <Label [text]="user.Department" class="user-department"></Label>
+                </StackLayout>
+
+                <!-- Status & Role Badges -->
+                <StackLayout col="2" row="0" verticalAlignment="top">
+                    <Label [text]="getRoleBadgeText(user.Role)" [backgroundColor]="getRoleColor(user.Role)"
+                        class="role-badge mb-2" color="white" borderRadius="12"></Label>
+                    <StackLayout orientation="horizontal">
+                        <Label [text]="'●'" [color]="getStatusColor(user.Status)" class="status-dot mr-1"></Label>
+                        <Label [text]="user.Status" [color]="getStatusColor(user.Status)" class="status-text"></Label>
+                    </StackLayout>
+                </StackLayout>
+            </GridLayout>
+
+            <!-- Performance Stats -->
+            <GridLayout columns="*, *" class="stats-container mb-3 p-3" backgroundColor="#f8fafc" borderRadius="12">
+                <StackLayout col="0" class="stat-item">
+                    <Label text="✓ Tasks Completed" class="stat-item-label mb-1"></Label>
+                    <Label [text]="user.tasksCompleted" class="stat-item-value"></Label>
+                </StackLayout>
+
+                <StackLayout col="1" class="stat-item">
+                    <Label text="🔧 Faults Resolved" class="stat-item-label mb-1"></Label>
+                    <Label [text]="user.faultsResolved" class="stat-item-value"></Label>
+                </StackLayout>
+            </GridLayout>
+
+            <!-- Additional Info -->
+            <GridLayout columns="*, *" class="mb-3">
+                <Label col="0" [text]="'🕐 Last Active: ' + getTimeAgo(user.lastActive)" class="info-text"></Label>
+                <Label col="1" [text]="'📅 Joined: ' + (user.joinedDate | date:'MMM yyyy')" class="info-text"
+                    textAlignment="right"></Label>
+            </GridLayout>
+
+            <!-- Action Buttons -->
+            <GridLayout columns="*, *, *, *" class="action-buttons">
+                <!-- View Details -->
+                <StackLayout col="0" (tap)="viewUserDetails(user.ID)" class="action-btn mr-1" backgroundColor="#f1f5f9"
+                    borderRadius="12">
+                    <Label text="👁️" class="action-icon mb-1"></Label>
+                    <Label text="Details" class="action-label"></Label>
+                </StackLayout>
+
+                <!-- Toggle Admin -->
+                <StackLayout col="1" (tap)="toggleAdminRights(user)" class="action-btn mx-1"
+                    [backgroundColor]="user.Role === 'admin' ? '#fef3c7' : '#ddd6fe'" borderRadius="12">
+                    <Label [text]="user.Role === 'admin' ? '⭐' : '👤'" class="action-icon mb-1"></Label>
+                    <Label [text]="user.Role === 'admin' ? 'Admin' : 'Make Admin'" class="action-label"></Label>
+                </StackLayout>
+
+                <!-- Toggle Status -->
+                <StackLayout col="2" (tap)="toggleUserStatus(user)" class="action-btn mx-1"
+                    [backgroundColor]="user.Status === 'active' ? '#dcfce7' : '#fee2e2'" borderRadius="12">
+                    <Label [text]="user.Status === 'active' ? '✓' : '⏸'" class="action-icon mb-1"></Label>
+                    <Label [text]="user.Status === 'active' ? 'Active' : 'Inactive'" class="action-label"></Label>
+                </StackLayout>
+
+                <!-- Delete User -->
+                <StackLayout col="3" (tap)="deleteUser(user.ID)" class="action-btn ml-1" backgroundColor="#fee2e2"
+                    borderRadius="12">
+                    <Label text="🗑️" class="action-icon mb-1"></Label>
+                    <Label text="Delete" class="action-label"></Label>
+                </StackLayout>
+            </GridLayout>
+        </StackLayout>
+
+    </StackLayout>
+</ScrollView>
+
+<style>
+    /* Background */
+    .bg-gradient {
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    }
+
+    /* Statistics Cards */
+    .stat-card {
+        border: 1px solid #e2e8f0;
+        text-align: center;
+    }
+
+    .stat-icon {
+        font-size: 28;
+        text-align: center;
+    }
+
+    .stat-number {
+        font-size: 24;
+        font-weight: bold;
+        color: #1f2937;
+        text-align: center;
+    }
+
+    .stat-label {
+        font-size: 11;
+        color: #6b7280;
+        text-align: center;
+    }
+
+    /* Filter Buttons */
+    .filter-btn {
+        font-size: 13;
+        font-weight: 600;
+        padding: 8 16;
+        min-width: 80;
+    }
+
+    /* Section Header */
+    .section-header {
+        border-left: 4px solid #6366f1;
+        padding-left: 16;
+    }
+
+    .section-title {
+        font-size: 20;
+        font-weight: bold;
+        color: #1f2937;
+    }
+
+    .section-subtitle {
+        font-size: 13;
+        color: #6b7280;
+    }
+
+    /* Empty State */
+    .empty-icon {
+        font-size: 48;
+        text-align: center;
+    }
+
+    .empty-title {
+        font-size: 18;
+        font-weight: bold;
+        color: #374151;
+        text-align: center;
+    }
+
+    .empty-subtitle {
+        font-size: 14;
+        color: #6b7280;
+        text-align: center;
+    }
+
+    /* User Cards */
+    .user-card {
+        border: 1px solid #e5e7eb;
+    }
+
+    /* Avatar */
+    .avatar-container {
+        justify-content: center;
+        align-items: center;
+    }
+
+    .avatar-text {
+        font-size: 22;
+        font-weight: bold;
+        color: white;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    /* User Info */
+    .user-name {
+        font-size: 17;
+        font-weight: bold;
+        color: #1f2937;
+    }
+
+    .user-email {
+        font-size: 13;
+        color: #6b7280;
+    }
+
+    .user-department {
+        font-size: 12;
+        color: #9ca3af;
+    }
+
+    /* Badges */
+    .role-badge {
+        font-size: 10;
+        font-weight: bold;
+        padding: 4 10;
+        text-align: center;
+    }
+
+    .status-dot {
+        font-size: 14;
+    }
+
+    .status-text {
+        font-size: 12;
+        font-weight: 600;
+        text-transform: capitalize;
+    }
+
+    /* Performance Stats */
+    .stats-container {
+        border: 1px solid #e2e8f0;
+    }
+
+    .stat-item {
+        text-align: center;
+    }
+
+    .stat-item-label {
+        font-size: 11;
+        color: #6b7280;
+        text-align: center;
+    }
+
+    .stat-item-value {
+        font-size: 20;
+        font-weight: bold;
+        color: #1f2937;
+        text-align: center;
+    }
+
+    /* Additional Info */
+    .info-text {
+        font-size: 11;
+        color: #9ca3af;
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+        margin-top: 4;
+    }
+
+    .action-btn {
+        padding: 10 4;
+        text-align: center;
+        elevation: 1;
+    }
+
+    .action-icon {
+        font-size: 20;
+        text-align: center;
+    }
+
+    .action-label {
+        font-size: 10;
+        font-weight: 600;
+        color: #374151;
+        text-align: center;
+    }
+</style>

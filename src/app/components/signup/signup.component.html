@@ -1,0 +1,84 @@
+<!-- Modern Signup Component Template -->
+<ActionBar visibility="hidden"></ActionBar>
+<ScrollView>
+    <StackLayout class="signup-container">
+
+        <!-- Header Section -->
+        <StackLayout class="header-section" horizontalAlignment="center" verticalAlignment="center">
+            <Image src="~/assets/icons/ticket.png" width="32" height="32" stretch="aspectFit" class="app-logo"></Image>
+            <Label text="Create your account and Log your Faults" class="welcome-text"></Label>
+        </StackLayout>
+
+        <!-- Main Signup Card -->
+        <StackLayout class="signup-card">
+
+            <!-- Input Fields Container -->
+            <StackLayout class="inputs-container">
+
+                <!-- Username Input -->
+                <StackLayout class="input-wrapper">
+                    <Label text="Username" class="input-label"></Label>
+                    <TextField [(ngModel)]="username" hint="Choose a username" autocorrect="false"
+                        autocapitalizationType="none" class="modern-input" returnKeyType="next">
+                    </TextField>
+                </StackLayout>
+
+                <!-- Email Input -->
+                <StackLayout class="input-wrapper">
+                    <Label text="Email Address" class="input-label"></Label>
+                    <TextField [(ngModel)]="email" hint="Enter your email" keyboardType="email" autocorrect="false"
+                        autocapitalizationType="none" class="modern-input" returnKeyType="next">
+                    </TextField>
+                </StackLayout>
+
+                <!-- Password Input -->
+                <StackLayout class="input-wrapper">
+                    <Label text="Password" class="input-label"></Label>
+                    <TextField [(ngModel)]="password" hint="Create a password (min 6 characters)" secure="true"
+                        class="modern-input" returnKeyType="next">
+                    </TextField>
+                </StackLayout>
+
+                <!-- Confirm Password Input -->
+                <StackLayout class="input-wrapper">
+                    <Label text="Confirm Password" class="input-label"></Label>
+                    <TextField [(ngModel)]="confirmPassword" hint="Re-enter your password" secure="true"
+                        class="modern-input" returnKeyType="done">
+                    </TextField>
+                </StackLayout>
+
+            </StackLayout>
+
+            <!-- Error Message -->
+            <Label *ngIf="errorMessage" [text]="errorMessage" class="error-message"></Label>
+
+            <!-- Terms Agreement -->
+            <StackLayout orientation="horizontal" class="terms-section">
+                <Switch [(ngModel)]="agreeToTerms" class="modern-switch"></Switch>
+                <Label text="I agree to the " class="terms-label"></Label>
+                <Label text="Terms & Conditions" (tap)="onViewTerms()" class="terms-link"></Label>
+            </StackLayout>
+
+            <!-- Signup Button -->
+            <Button text="Create Account" (tap)="onSignup()" [isEnabled]="isFormValid() && !isLoading"
+                class="signup-button">
+            </Button>
+
+            <!-- Loading State -->
+            <StackLayout *ngIf="isLoading" class="loading-container">
+                <ActivityIndicator [busy]="isLoading" class="loading-spinner"></ActivityIndicator>
+                <Label text="Creating your account..." class="loading-label"></Label>
+            </StackLayout>
+
+        </StackLayout>
+
+        <!-- Bottom Section -->
+        <StackLayout class="bottom-section">
+            <StackLayout orientation="horizontal" class="login-row" horizontalAlignment="center">
+                <Label text="Already have an account? " class="login-question"></Label>
+                <Label text="Sign In" (tap)="onGoToLogin()" class="login-link"></Label>
+            </StackLayout>
+        </StackLayout>
+
+    </StackLayout>
+</ScrollView>

@@ -1,64 +1,237 @@
+/* Modern Ticket Styles */
+
+/* Status Filter */
+.status-filter-container {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 0 0 8 0;
+}
+
 .status-filter {
-  background-color: #F5F5F5;
-  border-bottom-width: 1;
-  border-bottom-color: #E0E0E0;
+  background-color: transparent;
 }
 
 .filter-btn {
-  background-color: white;
-  color: #666666;
-  border-radius: 16;
-  padding: 8 16;
-  font-size: 12;
-  border-width: 1;
-  border-color: #E0E0E0;
+  background-color: rgba(255, 255, 255, 0.15);
+  color: white;
+  border-radius: 20;
+  padding: 10 18;
+  font-size: 13;
+  font-weight: 500;
+  border-width: 1.5;
+  border-color: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10);
 }
 
 .filter-btn.active {
-  background-color: #2196F3;
-  color: white;
-  border-color: #2196F3;
+  background-color: white;
+  color: #1e293b;
+  border-color: white;
+  font-weight: 600;
 }
 
+/* Tickets Container */
+.tickets-container {
+  background-color: #f8fafc;
+}
+
+/* Ticket Cards */
 .ticket-card {
+  background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+  border-radius: 16;
+  margin-bottom: 16;
+  padding: 20;
+  elevation: 3;
+  border-width: 1;
+  border-color: rgba(148, 163, 184, 0.1);
+  box-shadow: 0 4 6 rgba(0, 0, 0, 0.05);
+}
+
+/* Ticket Header */
+.ticket-header {
+  margin-bottom: 12;
+}
+
+.ticket-title-section {
+  padding-right: 12;
+}
+
+.ticket-title {
+  font-size: 17;
+  font-weight: 600;
+  color: #1e293b;
+  line-height: 22;
+  margin-bottom: 4;
+}
+
+.ticket-id {
+  font-size: 12;
+  color: #64748b;
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+.badges-container {
+  vertical-align: top;
+}
+
+/* Priority Badge */
+.priority-badge {
+  border-radius: 12;
+  font-size: 10;
+  font-weight: 600;
+  padding: 6 12;
+  color: white;
+  text-align: center;
+  min-width: 60;
+  letter-spacing: 0.5;
+}
+
+/* Status Badge Full Width */
+.status-badge-full {
   border-radius: 8;
-  elevation: 2;
-  border-left-width: 4;
-  border-left-color: #2196F3;
+  font-size: 11;
+  font-weight: 600;
+  padding: 8 12;
+  color: white;
+  text-align: center;
+  margin: 8 0 12 0;
+  letter-spacing: 0.5;
 }
 
-.priority-badge, .status-badge {
-  border-radius: 10;
-  font-size: 9;
-  padding: 4 8;
-  min-width: 50;
+/* Ticket Description */
+.ticket-description {
+  font-size: 14;
+  color: #475569;
+  line-height: 20;
+  margin-bottom: 16;
 }
 
+/* Ticket Meta */
 .ticket-meta {
-  margin-top: 8;
-  padding-top: 8;
+  padding-top: 16;
   border-top-width: 1;
-  border-top-color: #F0F0F0;
+  border-top-color: rgba(148, 163, 184, 0.15);
 }
 
+.meta-left {
+  padding-right: 8;
+}
+
+.meta-right {
+  text-align: right;
+  padding-left: 8;
+}
+
+.meta-item {
+  margin-bottom: 6;
+  vertical-align: center;
+}
+
+.meta-item.assignee {
+  margin-bottom: 0;
+}
+
+.meta-icon {
+  font-size: 12;
+  margin-right: 6;
+  width: 16;
+}
+
+.meta-text {
+  font-size: 12;
+  font-weight: 500;
+  color: #64748b;
+}
+
+.meta-text.assigned {
+  color: #059669;
+}
+
+.meta-text.unassigned {
+  color: #dc2626;
+  font-style: italic;
+}
+
+.meta-date {
+  font-size: 11;
+  color: #94a3b8;
+  margin-bottom: 8;
+  font-weight: 500;
+}
+
+/* Empty State */
 .empty-state {
   text-align: center;
-  margin-top: 60;
-  padding: 20;
+  margin-top: 80;
+  padding: 40 20;
 }
 
+.empty-icon {
+  font-size: 48;
+  margin-bottom: 16;
+  opacity: 0.6;
+}
+
+.empty-title {
+  font-size: 20;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 8;
+}
+
+.empty-subtitle {
+  font-size: 14;
+  color: #94a3b8;
+  line-height: 20;
+}
+
+/* Utility Classes */
 .text-right {
   text-align: right;
 }
 
-.text-gray-600 {
-  color: #666666;
+/* Priority Colors (you can customize these) */
+.priority-high {
+  background-color: #ef4444;
 }
 
-.text-gray-500 {
-  color: #999999;
+.priority-medium {
+  background-color: #f59e0b;
 }
 
-.text-gray-400 {
-  color: #AAAAAA;
+.priority-low {
+  background-color: #10b981;
+}
+
+/* Status Colors (you can customize these) */
+.status-open {
+  background-color: #3b82f6;
+}
+
+.status-in-progress {
+  background-color: #f59e0b;
+}
+
+.status-resolved {
+  background-color: #10b981;
+}
+
+.status-closed {
+  background-color: #6b7280;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480) {
+  .ticket-card {
+    padding: 16;
+    margin-bottom: 12;
+  }
+
+  .ticket-title {
+    font-size: 16;
+  }
+
+  .ticket-meta {
+    padding-top: 12;
+  }
 }
